@@ -1,0 +1,155 @@
+/*
+ *  Copyright (c) 2016, Thomas Jahn <vv3@t-und-j.de>
+ *
+ *  This file is part of VV3.
+ *
+ *  VV3 is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  VV3 is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with VV3.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *  ----
+ *  In this text file we document the commands implemented.
+ */
+
+
+
+
+LOGIN
+	Present login credentials. May respond with {"success":"no"} or {"success":"yes"}.
+
+
+GET_LOGIN
+	Returns the visitor's current login status. Response may be
+	{"status":"out"} or ...
+
+
+LOGOUT
+	Ask for a logout. Responds with nothing.
+
+
+CHANGE_PASSWORD
+
+
+
+GET_TOOL
+	Returns the template of the tool key.
+
+
+GET_TOOL_SCRIPT
+	Returns the script of the tool key.
+
+
+GET_LIST_OF_TOOLS
+
+
+
+GET_CONTAINER
+
+
+
+GET_BASIC_INFO
+	Returns basic information about the lecture; e.g.
+	{"lecture":"Testvorlesung", "term":"SoSe 2013", "lecturer":"Prof. Nobody"}
+
+
+GET_MENU
+	Returns a description of the menu that is to be created.
+
+
+TOOL_I
+	Send subcmd alongside with subcmddata to the interface of the tool key.
+
+
+register:GET_ALL_GROUPS
+	Get a list of all available groups alongside with some information.
+
+
+register:REGISTER
+	Asks for a new student to be inserted into the database.
+
+
+enterscores:FIND_STUDENTS
+	Returns a list of all students (their family- and their givenname).
+
+
+enterscores:ENTER_SCORE
+	Enter the score of a certain sheet.
+
+
+exams:GET_ALL_EXAMS
+	Get a list of all exams.
+
+
+groups:GET_ALL_GROUPS
+	Get a list of all groups.
+
+
+groups:GET_STUDENTS_IN_GROUP
+	Get a list of all students in a certain group.
+
+
+groups:GET_GROUP_JSON
+
+
+
+groups:SAVE_CHANGES
+	Make some changes to the data.
+
+
+scoreresults:GET_STUDENTS_SCORES
+	Get a list of all scores achieved by students.
+
+
+scoresentered:FIND_STUDENTS
+	# same as enterscores:FIND_STUDENTS
+
+
+scoresentered:GET_SCORES
+	Get a list of all scores.
+
+
+scoresentered:EDIT_SCORE
+	Change a certain score.
+
+
+students:FIND_STUDENTS
+	Similar to enterscores:FIND_STUDENTS but also the matrnr is returned.
+
+
+students:GET_ALL_STUDENTS
+	Get a list of all students.
+
+
+students:GET_STUDENT
+	Get information about a specific student.
+
+
+students:GET_SCORES
+	Get the scores of a student. See also scoresentered:GET_SCORES
+
+
+students:SAVE_CHANGES
+	Change some data.
+
+
+users:GET_ALL_USERS
+	Get a list of all users.
+
+
+users:GET_USER
+	Get information about a certain user.
+
+
+users:SAVE_CHANGES
+	Edit certain information about a certain user.
+
+

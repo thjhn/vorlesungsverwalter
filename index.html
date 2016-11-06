@@ -1,0 +1,94 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<!--
+
+    Copyright (c) 2016, Thomas Jahn <vv3@t-und-j.de>
+
+    This file is part of VV3.
+
+    VV3 is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    VV3 is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with VV3.  If not, see <http://www.gnu.org/licenses/>.
+
+
+    ----
+
+    This html-document is the entry page for every user using VV3.
+
+-->
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<title>VV3 &ndash; der Vorlesungsverwalter</title>
+	<!--link rel="stylesheet" type="text/css" href="gui/style.css"></link-->
+	<link rel="stylesheet" type="text/css" href="client/css/screen-main.css"></link>
+	<link rel="stylesheet" type="text/css" href="client/css/screen-forms.css"></link>
+	<link rel="stylesheet" type="text/css" href="client/jquery/jquery.autocomplete.css"/>
+  <!--link rel="stylesheet" href="//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css"-->
+	<link rel="stylesheet" type="text/css" href="client/css/jquery-ui-1.10.4.custom.css"></link>
+	<script type="text/javascript" src="client/jquery/jquery-min.js"></script>
+	<script type="text/javascript" src="client/jquery/jquery.base64.js"></script>
+	<script src="//code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+
+	<script type="text/javascript" src="gui-default/jscript/generaldialogs.js"></script>
+	<script type="text/javascript" src="gui-default/jscript/loginout.js"></script>
+
+
+	<!-- The following are needed for autocompletion -->
+	<!--link rel="stylesheet" href="client/jquery/jquery-ui-1.10.3.custom.css"-->
+	<!--script type="text/javascript" src="client/jquery/jquery-ui-1.10.3.custom.min.js"></script-->
+	<script type="text/javascript" src="client/jquery/jquery.tablesorter.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="client/css/dialog.css">
+
+	<script type="text/javascript">
+
+
+		// panels is a array containing the necessary information about each panel which is currently available.
+		var panels = new Array();
+
+
+
+	</script>
+</head>
+<body>
+	<div id="nojs"><h3>VorlesungsVerwalter und JavaScript</h3><p>Liebe Nutzerin, lieber Nutzer!</p><p>Um den Vorlesungsverwalter nutzen zu k&ouml;nnen m&uuml;ssen Cookies und JavaScript aktiviert sind. Da diese Information angezeigt wird, scheint JavaScript nicht korrekt zu funktionieren. Versuchen Sie bitte, JavaScript f&uuml;r diese Seite zu erlauben.</p><p>Ihr Vorlesungsteam</p></div>
+	<div id="general_errormsg" title="Fehler">
+		<div class="ui-state-error ui-corner-all" style="padding: 0 .7em;">
+			<p><span class="ui-icon ui-icon-alert" style="float: left; margin-right: .3em;"></span><span id='general_errormsg_msg'></span></p>
+		</div>
+	</div>
+	<div id="general_successmsg" title="Erfolg">
+		<div class="ui-corner-all" style="padding: 0 .7em;">
+			<p><span class="ui-icon ui-icon-check" style="float: left; margin-right: .3em;"></span><span id='general_successmsg_msg'></span></p>
+		</div>
+	</div>
+
+	<div id='loginpanel'></div>
+	<div id='top'><div>
+		<span id='slogan'>da</span>
+		<span id='login'></span>
+	</div></div>
+	<div id='main'>
+		<div id='switches'></div>
+		<div id='panel'></div>
+	</div>
+	<div id='footer'>
+		<div>
+			Powered by <em>VV3 &ndash; der VorlesungsVerwalter</em>.
+		</div>
+	</div>
+
+</body>
+</html>

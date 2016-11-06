@@ -1,0 +1,209 @@
+/*
+ *  Copyright (c) 2016, Thomas Jahn <vv3@t-und-j.de>
+ *
+ *  This file is part of VV3.
+ *
+ *  VV3 is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  VV3 is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with VV3.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+body{
+	/* Position and Size */
+	margin:0px;
+	margin-bottom:50px;
+
+	/* Background */
+	background-color:#eeeeee;
+
+	/* Font */
+	font-family:sans-serif;
+	font-size:0.9em;
+}
+
+#nojs{
+	position:absolute;
+	height:100%;
+	width:100%;
+	background-color:white;
+	z-index:9;
+	padding:5%;
+}
+#nojs p{
+	max-width:400px;
+}
+
+#top{
+	background-color:#00aa00;
+	height:30px;
+	margin-bottom:10px;
+}
+#top img{
+ height:16px;
+}
+
+#top>div{
+	width:900px;
+	margin-left:auto;
+	margin-right:auto;
+	padding-top:4px;
+}
+
+#slogan{
+	font-size:120%;
+	font-weight:bold;
+	font-family:ComicSansMs,serif;
+	font-style:italic;
+}
+
+#login{
+	width:50%;
+	display:block;
+	float:right;
+	text-align:right;
+	padding:4px;
+}
+
+
+#loginpanel{
+	background-color:#00aa00;
+	position:absolute;
+	right:30%;
+	top:30px;
+	padding:15px;
+}
+#loginpanel div{
+	margin-bottom:12px;
+}
+
+
+#main{
+	/* Position and Size */
+	margin-left:auto;
+	margin-right:auto;
+	width:900px;
+}
+
+#switches{
+	/* Position and Size */
+	float:left;
+	width:220px;
+}
+
+#switches h3{
+	/* Position and Size */
+	margin:0px;
+	margin-top:7px;
+	padding:2px;
+	padding-left:30px;
+}
+
+#switches h3:first-child{
+	margin-top:0px;
+}
+
+
+#switches .ui-accordion-content{
+	/* Position */
+	padding-left:5px;
+	padding-top:3px;
+	
+	/* Colors and Borders */
+	background-color:white;
+	color:black;
+}
+
+#switches .aSwitch{
+	/* Position and Size */
+	padding-left:22px;
+	padding-bottom:5px;
+
+	background-image:url("../icons/green16x16.png");
+	cursor:pointer;cursor:hand;
+	background-position:left top;
+	background-repeat:no-repeat;
+}
+
+#panel{
+	/* Position and Size */
+	margin-left:230px;
+	max-width:700px;
+
+	/* Colors and Background */
+	border:1px solid #00aa00;
+	background-color:white;
+}
+
+
+#panel>.container>h1{
+	margin:0px;
+	font-size:130%;
+	background-color: #00aa00;
+	padding:3px;
+}
+#panel>.container>*{
+  margin-left:1em;
+  margin-right:1em;
+}
+
+#panel>.container h2{
+	margin-top:1em;
+	font-size:110%;
+}
+
+#panel .errorMsgInPanel{
+	border:2pt solid red;
+	background-color:#ffaaaa;
+	margin:1em;
+	padding-right:1em;
+	padding-left:40px;
+	background-image:url("../icons/error.png");
+	background-repeat:no-repeat;
+	background-position:left center;
+}
+
+table.colored th{
+	background-color:#00aa00;
+	padding:1pt;
+}
+
+table.colored td{
+	background-color:#ddffdd;
+	padding:1pt;
+}
+
+
+
+#footer{
+	/* position and size */
+	bottom:0px;
+	position:fixed;
+	width:100%;
+	height:20px;
+	padding-top:10px;	
+	text-align:center;
+
+	/* font and color */
+	background-color:#eeeeee;
+	color:#444444;
+	font-size:80%;
+}
+
+/* Hidden fields should be hidden */
+.hidden{
+	display:none;
+}
+
+input.fail{
+	border:2pt solid red;
+}
+

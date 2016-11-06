@@ -1,0 +1,82 @@
+/*
+ *  Copyright (c) 2016, Thomas Jahn <vv3@t-und-j.de>
+ *
+ *  This file is part of VV3.
+ *
+ *  VV3 is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  VV3 is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with VV3.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+.inputForm .inputbox{
+	display:block;
+
+	margin-left:2em;
+	margin-bottom:14px;
+	/* Position and Size */
+	padding-left:22px;
+	padding-bottom:5px;
+
+	background-image:url("../icons/green16x16.png");
+	cursor:pointer;cursor:hand;
+	background-position:left top;
+	background-repeat:no-repeat;
+
+}
+
+.inputForm button{
+	margin-left:2em;
+}
+
+.inputForm .inputbox input{
+	width:220px;
+	height:25px;
+	border:2pt solid #00aa00;
+}
+
+.inputForm .inputbox input[type=checkbox]{
+	width:20px;
+	height:13px;
+
+}
+
+.inputForm .inputbox.sm{
+	width:100px;
+}
+
+.inputForm .inputbox.sm input{
+	width:90px;
+}
+
+.inputForm .inputbox.fail{
+	background-image:url("../icons/error.png");
+	background-position:right center;
+	background-repeat:no-repeat;
+}
+
+.inputForm .inputbox .label{
+	/* Position and Size */
+	display:block;
+}
+
+
+#students_scores input{
+	width:50px;
+}
+
+#mod_students_select{
+	margin-top:2em;
+}
+
+.enterscores_anamebox button{
+margin:5px;
+}
