@@ -149,7 +149,7 @@ class Exams{
 
 		$list = array();
 		// iterate over exams
-		foreach($users->dom->getElementsByTagName("exams") as $exam){
+/*		foreach($users->dom->getElementsByTagName("exams") as $exam){
 			// TODO Error handling
 			$item["exam"] = $exam->getAttribute("id");
 			$item["name"] = $exam->getElementsByTagName("name")->item(0)->nodeValue;
@@ -157,7 +157,7 @@ class Exams{
 			$item["enterscores"] = $exam->getElementsByTagName("enterscores")->item(0)->nodeValue;
 
 			$list[] = $item;
-		}
+		}*/
 		return json_encode($list);
 	}
 }

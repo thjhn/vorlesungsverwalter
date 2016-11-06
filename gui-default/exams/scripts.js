@@ -109,7 +109,7 @@ function refreshExamsTable(){
 		url:"i.php",
 		type:"post",
 		dataType:"json",
-		data:{cmd:"TOOL_I",key:"exams",subcmd:"GET_ALL_EXAMS",subcmddata:""}
+		data:{cmd:"GET_ALL_EXAMS",data:""}
 	}).done(function(data){
 		$("#exams_examlist tbody").empty();
 		for(i=0; i<data.length; i++){
@@ -140,10 +140,8 @@ function refreshExamsTable(){
 				type:"post",
 				dataType:"json",
 				data:{
-					key:"users",
-					cmd:"TOOL_I",
-					subcmd:"GET_USER",
-					subcmddata:cur_username
+					cmd:"GET_USER",
+					data:cur_username
 				}
 			}).done(function(data){
 				console.log(data);
@@ -179,6 +177,6 @@ function refreshExamsTable(){
 	});
 
 	// Update this table regularly (each 5 min)
-	window.setTimeout(refreshStudentsTable,1000*60*5);
+	window.setTimeout(refreshExamsTable,1000*60*5);
 }
 refreshExamsTable();

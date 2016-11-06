@@ -198,11 +198,20 @@ switch($cmd){
 
 
 	///////////////////////////////////////////////////////////////
-	// Get a JSON list of all gropus.
+	// Get a JSON list of all groups.
 	// 
 	// Roles required: none
 	case 'LIST_ALL_GROUPS':
 		print(Groups::getAllGroupsJson());
+		break;
+
+
+	///////////////////////////////////////////////////////////////
+	// Get a JSON list of all exams.
+	// 
+	// Roles required: none
+	case 'GET_ALL_EXAMS':
+		print(Exams::getAllExamsJson());
 		break;
 
 
@@ -561,7 +570,7 @@ switch($cmd){
 		break;
 
 	case 'EDIT_USER':
-		// Get data of a specific student
+		// Edit data of a specific user
 		Logger::log("Interface got 'EDIT_USER' with data $data.",Logger::LOGLEVEL_VERBOSE);
 		if(!$AUTH->hasRole("admin")){
 			Logger::log("Interface got 'EDIT_USER' with data $data but the user was not allowed to call this 	command.",Logger::LOGLEVEL_ERROR);
