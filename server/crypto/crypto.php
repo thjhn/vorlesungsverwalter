@@ -96,7 +96,6 @@ class Crypto{
 
 		$iv = openssl_random_pseudo_bytes(openssl_cipher_iv_length($method));
 		$crypttext = openssl_encrypt($data,$method,$auth->privkeykey,0,$iv);
-Logger::log("encrypt_in_team with ".$auth->privkeykey,Logger::LOGLEVEL_VERBOSE);
 		if($crypttext === false){
 			return false;
 		}
@@ -120,7 +119,6 @@ Logger::log("encrypt_in_team with ".$auth->privkeykey,Logger::LOGLEVEL_VERBOSE);
 		$msg_enc = substr(base64_decode($data),$iv_length);
 		$iv = substr(base64_decode($data),0,$iv_length);
 		$plaintext = openssl_decrypt($msg_enc,$method,$auth->privkeykey,0,$iv);
-Logger::log("decrypt_in_team with ".$auth->privkeykey,Logger::LOGLEVEL_VERBOSE);
 
 		if($plaintext === false){
 			return false;
