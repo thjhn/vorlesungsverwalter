@@ -118,7 +118,7 @@ $("#users_add_dialog").dialog({
 				rolearray.push("corrector");
 			}
 
-			var dataobject = {username:$("#users_add_dialog input[name=username]").attr("value"), realname:$("#users_add_dialog input[name=realname]").attr("value"), password:$("#users_add_dialog input[name=password]").attr("value"), roles:rolearray, };
+			var dataobject = {username:$("#users_add_dialog input[name=username]").attr("value"), realname:$("#users_add_dialog input[name=realname]").attr("value"),enabled:$("#users_add_dialog select[name=enabled]  option:selected").attr("value"), password:$("#users_add_dialog input[name=password]").attr("value"), roles:rolearray, };
 console.log(dataobject);
 			$.ajax({
 				url:"i.php",

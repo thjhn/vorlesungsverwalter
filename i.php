@@ -560,7 +560,7 @@ switch($cmd){
 			break;
 		}
 
-		$fb = Users::addNewUser($data['username'], $data['password'], $data['realname'], $data['roles'], $AUTH);
+		$fb = Users::addNewUser($data['username'], $data['password'], $data['realname'], $data['enabled'], $data['roles'], $AUTH);
 		if($fb === true){
 			print("{\"success\":\"yes\"}");
 		}else{

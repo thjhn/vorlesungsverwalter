@@ -26,7 +26,7 @@ function generate_users_template(){
 	$tmpl .= "<div id=\"users_changes_dialog\" title=\"Speicherung der &Auml;nderung\"></div>";
 
 	// if the users adds a mew user, a dialog appears:
-	$tmpl .= "<div id=\"users_add_dialog\" title=\"Benutzer hinzuf&uuml;gen\"><div><form><table><tr><td>Benutzername</td><td><input type='input' name='username'></td></tr><tr><td>Realname</td><td><input type='input' name='realname'></td></tr><tr><td>Passwort</td><td><input type='password' name='password'></td></tr><tr><td>Korrektor</td><td><select name='corrector'><option value=\"yes\">ja</option><option value=\"no\" selected>nein</option></select></td></tr><tr><td>Admin</td><td><select name='admin'><option value=\"yes\">ja</option><option value=\"no\" selected>nein</option></select></td></tr></table></form></div></div>";
+	$tmpl .= "<div id=\"users_add_dialog\" title=\"Benutzer hinzuf&uuml;gen\"><div><form><table><tr><td>Benutzername</td><td><input type='input' name='username'></td></tr><tr><td>Realname</td><td><input type='input' name='realname'></td></tr><tr><td>Passwort</td><td><input type='password' name='password'></td></tr><tr><td>Aktiv</td><td><select name='enabled'><option value=\"yes\">ja</option><option value=\"no\">nein</option></select></td></tr><tr><td>Korrektor</td><td><select name='corrector'><option value=\"yes\">ja</option><option value=\"no\" selected>nein</option></select></td></tr><tr><td>Admin</td><td><select name='admin'><option value=\"yes\">ja</option><option value=\"no\" selected>nein</option></select></td></tr></table></form></div></div>";
 
 
 	// in panel there is a list of all students

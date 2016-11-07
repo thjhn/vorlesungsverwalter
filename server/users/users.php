@@ -257,7 +257,7 @@ class Users{
 	 * @param Auth $auth the current user's auth object.
 	 * 
 	*/
-	public static function addNewUser($username, $password, $realname, $roles, $auth){
+	public static function addNewUser($username, $password, $realname, $enabled, $roles, $auth){
 		// before adding a new user we try to load it
 		$user = new Users($username,false);
 		if($user->loaded()){
@@ -274,6 +274,9 @@ class Users{
 		$nodeUserName = $users->dom->createElement('realname');
 		$nodeUserName->nodeValue = $realname;
 		$nodeUser->appendChild($nodeUserName);
+		$nodeEnabled = $users->dom->createElement('enabled');
+		$nodeEnabled->nodeValue = $enabled;
+		$nodeUser->appendChild($nodeEnabled);
 		$nodeUserName = $users->dom->createElement('privkeykey');
 		$nodeUser->appendChild($nodeUserName);
 		$nodeUserName = $users->dom->createElement('roles');
