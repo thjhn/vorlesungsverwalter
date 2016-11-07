@@ -30,11 +30,11 @@ class Exams{
 	var $exam,$editable,$examnode;
 
 	/**
-     * The constructor loads the exam using its id.
+	 * The constructor loads the exam using its id.
 	 * 
 	 * @param string $exam The exam id
 	 * @param boolean $editable If 'true', the values are changeable. If 'false' they are read-only.
-	*/
+	 */
 	function Exams($exam,$editable=false){
 		$this->exam = $exam;
 		$this->editable = $editable;
@@ -45,60 +45,69 @@ class Exams{
 		// find the exam by id.
 		$matches = 0;
 		foreach($this->dataset->dom->getElementsByTagName("exam") as $cur_exam){
-			if($cur_exam->getAttribute("id") == $this->exam){
+			if($cur_exam->getElementsByTagName("id")->item(0)->nodeValue == $this->exam){
 				// $cur_exam is the exam we were looking for
 				$matches++;
 				$this->examnode  = $cur_exam;
 				break;
 			}
 		}
+		// just remove the exam field if we have not found the exam.
+		if($matches == 0){
+			Logger::log("Failed loading exam with id ".$exam.".",Logger::LOGLEVEL_WARNING);
+			$this->exam = "";
+		}
+		// as we have just counted the number of nodes with this id, warn if the id
+		// occurs more than once.
+		if($matches > 1){
+			Logger::log("The id ".$exam." occurs $matches times.",Logger::LOGLEVEL_ERROR);
+		}
 	}
 
 	/**
-     * Try to get the value of a field.
+	 * Try to get the value of a field.
 	 * 
 	 * @param string $tagname The name of the field.
 	 *
 	 * @return mixed returns false if the required field is not present. It returns the value of the first node with that tagename else.
-	 *
-	 * @todo check whether loading a user was successfully before!
-	*/
+	 */
 	function getField($tagname){
-		$nodes = $this->examnode->getElementsByTagName($tagname);
-		if($nodes->length > 0){
-			if($nodes->length > 1) Logger::log("There are more than one field ".$tagname." for exam".$this->exam,Logger::LOGLEVEL_WARNING);
-			return $nodes->item(0)->nodeValue;
-		}else{
+		if($this->exam != ""){ // check whether loading an exam was successfully before
+			$nodes = $this->examnode->getElementsByTagName($tagname);
+			if($nodes->length > 0){
+				if($nodes->length > 1) Logger::log("There are more than one field ".$tagname." for exam".$this->exam,Logger::LOGLEVEL_WARNING);
+				return $nodes->item(0)->nodeValue;
+			}else{
+				return FALSE;
+			}
+		}else{ // exam was not loaded properly before
+			Logger::log("Tried to read field ".$tagname." from an exam that was not loaded properly.",Logger::LOGLEVEL_WARNING);
 			return FALSE;
 		}
 	}
 
 	/**
-     * Get most of the data about the Exam as a Json-object.
+         * Get most of the data about the Exam as a Json-object.
 	 * 
-	 * The Json contains a field 'success' which is 'yes' if there is a student loaded. It is 'no' else.
+	 * The Json contains a field 'success' which is 'yes' if there is an exam loaded. It is 'no' else.
 	 *
 	 * @return string Returns the json object.
-	*/
+	 */
 	function getDataJson(){
-/*		if($this->username != ""){
-			$rolelist = array();
-			foreach($this->usernode->getElementsByTagName("role") as $role){
-				$rolelist[] = $role->nodeValue;
-			}			
-
+		if($this->exam != ""){
 			$retstr  = "{";
 			$retstr .= "\"success\":\"yes\",";
-			$retstr .= "\"username\":\"".$this->username."\",";
-			$retstr .= "\"realname\":\"".$this->getField("realname")."\",";
-			$retstr .= "\"rolelist\":".json_encode($rolelist).",";
-			$retstr .= "\"enabled\":\"".$this->getField("enabled")."\"";
+			$retstr .= "\"exam\":\"".$this->exam."\",";
+			$retstr .= "\"name\":\"".$this->getField("name")."\",";
+			$retstr .= "\"registration\":\"".$this->getField("registration")."\",";
+			$retstr .= "\"enterscores\":\"".$this->getField("enterscores")."\"";
 			$retstr .= "}";
 			return $retstr;
 		}else{
-			// there is no student in this object
+			// there is no exam in this object
+			Logger::log("Tried to get all Data from an exam that was not loaded properly.",Logger::LOGLEVEL_WARNING);
 			return "{\"success\":\"no\"}";
-		}*/
+		}
 	}
 
 	/**
@@ -149,15 +158,15 @@ class Exams{
 
 		$list = array();
 		// iterate over exams
-/*		foreach($users->dom->getElementsByTagName("exams") as $exam){
+		foreach($users->dom->getElementsByTagName("exams") as $exam){
 			// TODO Error handling
-			$item["exam"] = $exam->getAttribute("id");
+			$item["exam"] = $exam->getElementsByTagName("id")->item(0)->nodeValue;
 			$item["name"] = $exam->getElementsByTagName("name")->item(0)->nodeValue;
 			$item["registration"] = $exam->getElementsByTagName("registration")->item(0)->nodeValue;
 			$item["enterscores"] = $exam->getElementsByTagName("enterscores")->item(0)->nodeValue;
 
 			$list[] = $item;
-		}*/
+		}
 		return json_encode($list);
 	}
 }

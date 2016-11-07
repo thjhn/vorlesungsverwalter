@@ -79,6 +79,7 @@ class Dataset{
 		if($this->writeable){
 			$this->dom->save($this->xml_file);
 		}else{
+			Logger::log("dataset.php tried to save changes in file ".$this->xml_file." which was opend read-only.",Logger::LOGLEVEL_WARNING);
 			return false;
 		}
 	}

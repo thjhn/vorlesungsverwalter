@@ -211,8 +211,66 @@ switch($cmd){
 	// 
 	// Roles required: none
 	case 'GET_ALL_EXAMS':
+		Logger::log("Interface got 'GET_ALL_EXAMS'.",Logger::LOGLEVEL_VERBOSE);
 		print(Exams::getAllExamsJson());
 		break;
+
+	///////////////////////////////////////////////////////////////
+	// Get a JSON with the data of the exam whose id is given
+	// as data.
+	// 
+	// Roles required: corrector, admin
+	case 'GET_EXAM':
+		Logger::log("Interface got 'GET_EXAM' with data $data.",Logger::LOGLEVEL_VERBOSE);
+		if(!$AUTH->hasRole("corrector") && !$AUTH->hasRole("admin")){
+			Logger::log("Interface got 'GET_EXAM' but the user was not allowed to call this 	command.",Logger::LOGLEVEL_ERROR);
+			print("{\"success\":\"no\",\"errormsg\":\"Schwerwiegender interner Fehler.\"}");
+			break;
+		}
+
+		$exam = new Exams($data);				
+		print($exam->getDataJson());
+		break;
+
+	///////////////////////////////////////////////////////////////
+	// Edit a specified exam.
+	// The exam and the new data are given in the data object.
+	// If the given exam-id is _new we actually create a new
+	// exam (and create our own exam-id).
+	// 
+	// Roles required: admin
+	case 'EDIT_EXAM':
+		Logger::log("Interface got 'EDIT_EXAM'.",Logger::LOGLEVEL_VERBOSE);
+		if($AUTH->hasRole("admin")){
+			// ex ante we assume that the following operations will be successfull
+			$success = true;
+			$errormsg = "";
+			// if the examid equals _new, we are asked to add a new group.
+			if($data['exam'] == "_new"){
+				$newid = Exams::addExam();
+				$exam = new Exams($newid,true);
+			}else{
+				$exam = new Exams($data['exam'],true);
+			}
+			// now, (try to) save changes
+			if( !$exam->saveChanges($data["changes"]) ){
+				// at least one score change failed
+				$success = false;
+				$errormsg .= "Die Änderung persönlicher Informationen konnte nicht gespeichert werden. ";
+			}
+
+			// now its time to return sth.
+			if( $success ){
+				print("{\"success\":\"yes\"}");
+			}else{
+				print("{\"success\":\"no\",\"errormsg\":\"".$errormsg."\"}");
+			}
+		}else{
+			Logger::log("Interface got 'EDIT_EXAM' but the user was not allowed to call this command.",Logger::LOGLEVEL_ERROR);
+			print("{\"success\":\"no\",\"errormsg\":\"Schwerwiegender interner Fehler. Keine Eintragungen wurden gespeichert!\"}");
+		}
+		break;
+
 
 
 	///////////////////////////////////////////////////////////////
