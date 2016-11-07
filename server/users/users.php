@@ -159,11 +159,13 @@ class Users{
 	 * @return boolean Was saving changes successful?
 	 */
 	function saveChanges($changes,$auth){
+		Logger::log("users.php: saveChanges() called.",Logger::LOGLEVEL_VERBOSE);
 		if($this->editable){
 			if($this->username != ""){
 				for($i=0;$i<count($changes);$i++){
 					// if the password is the field that is to be changed, we do not save the password itself.
 					if($changes[$i]['field'] == 'password'){
+						Logger::log("users.php: saveChanges() was called for a password.",Logger::LOGLEVEL_VERBOSE);
 						$changes[$i]['field'] = 'privkeykey';
 						$changes[$i]['newvalue'] = Crypto::encrypt_privkeykey($changes[$i]['newvalue'],$auth);
 						if($changes[$i]['newvalue'] === false){
@@ -284,13 +286,14 @@ class Users{
 		
 		$users->dom->childNodes->item(0)->appendChild($nodeUser);
 		$users->save();
+                Logger::log("Added a node for user $username to the users dataset.",Logger::LOGLEVEL_VERBOSE);
 
 		// before loading the user again we have to free the lock!
 		unset($users);
 
 		$user = new Users($username,true);
 		$user->changeRoles($roles);
-		$user->saveChanges([array("field"=>"password", "newvalue"=>$password)],$AUTH);
+		$user->saveChanges([array("field"=>"password", "newvalue"=>$password)],$auth);
 
 		return true;
 	}
