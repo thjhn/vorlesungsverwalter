@@ -68,16 +68,14 @@ class Sheet{
 	 * 
 	 * @param string $newScore The sheets's new Score
 	 * @return true or false, depending on the success of the operation.
-	 * @todo validation must be renewed.
 	*/
 	function updateScore($newScore,$auth){
 		if($this->sid != ""){
 			// We check whether the format of $score is valid.
-		/*	if(!ereg('^[0-9]+(.[0-9]+)?$', $newScore)){
-				// The Requested Student does not exist.
+			if(preg_match('/^[0-9]+(.[0-9]+)?$/', $newScore)==0){
 				Logger::log("sheet.php, updateScore: Called with invalid format score $newScore.",Logger::LOGLEVEL_VERBOSE);
 				return false;
-			}*/
+			}
 			if($this->editable){
 				$newScore = Crypto::encrypt_in_team($newScore,$auth);
 				if($newScore === false){
@@ -280,7 +278,6 @@ class Sheet{
 	 * @todo ERRORhandling; check whether the student really exists; Change type of $student into string[] to allow multiple students per sheet
 	 * 
 	 * @return A Json-object with a field 'success'.
-	 * @todo validation must be rewritten
 	*/
 	public static function setScore($auth,$sheet,$students,$score,$corrector){
 		// First, we check whether the students really exists.
@@ -294,11 +291,10 @@ class Sheet{
 		}
 
 		// Second, we check whether the format of $score is valid.
-/*		if(!ereg('^[0-9]+(.[0-9]+)?$', $score)){
-			// The Requested Student does not exist.
+		if(preg_match('/^[0-9]+(.[0-9]+)?$/', $score)==0){
 			Logger::log("sheet.php, setScore: User $auth requested to setScore with score $score. The format is considered invalid.",Logger::LOGLEVEL_VERBOSE);
 			return "{\"success\":\"no\",\"errormsg\":\"Das Format von 'Punkte' ist nicht valide.\"}";
-		}*/
+		}
 
 		// Now, we are sure that the students exists.
 		//load the sheets dataset in write-mode
@@ -357,7 +353,6 @@ class Sheet{
 	 * @param $auth The user's authentication object.
 	 * 
 	 * @return int 0 on success and -1 otherwise.
-         * @todo redo validty check
 	*/
 	public static function changeScore($sheet,$student,$newscore,$auth){
 		// First, we check whether this student really exists.
@@ -368,12 +363,10 @@ class Sheet{
 			return -1;			
 		}
 		// Second, we check whether the format of $newscore is valid.
-		// had to be disabled
-		/*if(!ereg('^[0-9]+(.[0-9]+)?$', $newscore)){
-			// The Requested Student does not exist.
+		if(pre_match('/^[0-9]+(.[0-9]+)?$/', $newscore)==0){
 			Logger::log("sheet.php, changeScore($sheet,$student,$newscore) was called. The format of newscore is considered invalid.",Logger::LOGLEVEL_VERBOSE);
 			return -1;
-		}*/
+		}
 
 		// Now, we are sure that the student exists.
 
