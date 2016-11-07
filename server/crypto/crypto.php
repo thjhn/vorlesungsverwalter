@@ -77,7 +77,7 @@ class Crypto{
 			openssl_private_decrypt(base64_decode($data), $plaintext, $res);
 			return $plaintext;
 		}else{
-			Logger::log("Could not use private key file. The password is $password",Logger::LOGLEVEL_ERROR);
+			Logger::log("Could not use private key file.",Logger::LOGLEVEL_ERROR);
 			return false;
 		}
 	}
