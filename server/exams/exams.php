@@ -158,7 +158,7 @@ class Exams{
 
 		$list = array();
 		// iterate over exams
-		foreach($users->dom->getElementsByTagName("exams") as $exam){
+		foreach($users->dom->getElementsByTagName("exam") as $exam){
 			// TODO Error handling
 			$item["exam"] = $exam->getElementsByTagName("id")->item(0)->nodeValue;
 			$item["name"] = $exam->getElementsByTagName("name")->item(0)->nodeValue;
@@ -168,6 +168,26 @@ class Exams{
 			$list[] = $item;
 		}
 		return json_encode($list);
+	}
+
+	/**
+	 * Add an exam with a newly generated id.
+	 * The values of the new exam are in no way specified. You sould call saveChanges afterwards!
+	 *
+	 * @return the id of the newly generated exam
+	*/	
+	public static function addExam(){
+		//load the exams dataset in write-mode
+		$exams = new Dataset('exams',true);
+		// create a new score-node and append that node to the dataset
+		$newid = uniqid(true);
+		$nodeExam = $exams->dom->createElement('exam');
+		$nodeExamID = $exams->dom->createElement('id');
+		$nodeExamID->nodeValue=$newid;
+		$nodeExam->appendChild($nodeExamID);
+		$exams->dom->childNodes->item(0)->appendChild($nodeExam);
+		$exams->save();
+		return $newid;
 	}
 }
 

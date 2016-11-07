@@ -256,7 +256,7 @@ switch($cmd){
 			if( !$exam->saveChanges($data["changes"]) ){
 				// at least one score change failed
 				$success = false;
-				$errormsg .= "Die Änderung persönlicher Informationen konnte nicht gespeichert werden. ";
+				$errormsg .= "Die Änderung der Klausureigenschaften konnten nicht gespeichert werden.";
 			}
 
 			// now its time to return sth.

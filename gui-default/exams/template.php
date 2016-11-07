@@ -29,6 +29,7 @@ function generate_exams_template(){
 	// in the lower part of the panel there is a list of exams
 	$tmpl .= "<h1>Klausuren</h1>";
 	$tmpl .= "<table class=\"tablesorter\" id=\"exams_examlist\"><thead><tr><th class=\"header\" colspan='2'>Klausur</th><th class=\"header\">Anmeldung</th><th class=\"header\">Bewerten</th></thead><tbody></tbody></table>";
+	$tmpl .= "<div><button id='exams_addexam'>Neue Klausur erstellen.</button></div>";
 
 	return $tmpl;
 

@@ -82,6 +82,26 @@ $("#exams_changes_dialog").dialog({
 	}
 });
 
+// make the button nicer using jquery-ui
+$( "#exams_addexam" ).button({
+	icons: {
+		primary: "ui-icon-plusthick"
+	},
+	text: true
+});
+
+// add an event to the 'add a group' button
+$("#exams_addexam").on('click',function(e){
+	e.preventDefault();
+	$("#exams_edit_dialog").dialog("open");
+	$("#exams_edit_dialog input[name=examid]").attr("value","_new");
+	$("#exams_edit_dialog input[name=name]").attr("value","");
+
+	// we mark each field with changes by adding the class 'field_edited'
+	$("#exams_edit_dialog input").addClass("field_edited");
+	$("#exams_edit_dialog input[type=hidden]").removeClass("field_edited");
+});
+
 
 // all we need in order to get the table
 function refreshExamsTable(){
