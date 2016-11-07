@@ -174,7 +174,6 @@ class Student{
 	 * @param string $ingroup The possibly new group
 	 *
 	 * @return array Returns an array of strings. On success the array is empty. Otherwise it contains a list of failures. Such failures currently include: the name of the field that could not been validated; DUPLICAT, if a student with the name familyname, givennahme combination already exists; INTERNAL if something very bad happend.
-	 * @todo replace  ereg!
 	 */
 	function editStudent($familyname, $givenname, $matrnr, $term, $course, $email, $ingroup){
 		if($this->editable){
@@ -182,23 +181,23 @@ class Student{
 				// We check the format of the given arguments.
 				// Whenever the check of a field failed, 
 				$inputFailures = array();
-				/*if(!ereg('^[a-zA-Z0-9._-]+@[a-zA-Z0-9-]+.[a-zA-Z.]{2,25}$', $email)){
+				if(preg_match('/^[a-zA-Z0-9._-]+@[a-zA-Z0-9-]+.[a-zA-Z.]{2,25}$/', $email)==0){
 					$inputFailures[] = "email";
 				}
-				if(!ereg('^[a-zA-ZÄÖÜäöüßÈèÉé-]+$', $familyname)){
+				if(preg_match('/^[a-zA-ZÄÖÜäöüßÈèÉé-]+$/', $familyname)==0){
 					$inputFailures[] = "familyname";
 				}
-				if(!ereg('^[a-zA-ZÄÖÜäöüßÈèÉé-]+$', $givenname)){
+				if(preg_match('/^[a-zA-ZÄÖÜäöüßÈèÉé-]+$/', $givenname)==0){
 					$inputFailures[] = "givenname";
 				}
-				if(!ereg('^[0-9]+$', $matrnr)){
+				if(preg_match('/^[0-9]+$/', $matrnr)==0){
 					$inputFailures[] = "matrnr";
 				}
-				if(!ereg('^[0-9]+$', $term)){
+				if(preg_match('/^[0-9]+$/', $term)==0){
 					$inputFailures[] = "term";
-				}*/
+				}
 				// TODO: Check validity of the course data
-				/*if(!ereg('^[a-zA-Z0-9ÄÖÜäöüßÈèÉé]+$', $course)){
+				/*if(preg_match('/^[a-zA-Z0-9ÄÖÜäöüßÈèÉé]+$/', $course)==0){
 					$inputFailures[] = "course";
 				}*/
 
@@ -208,7 +207,7 @@ class Student{
 					$inputFailures[] = "ingroup";
 				}
 
-				if(count($inputFailures) > 0){
+				if(count($inputFailures) > 0){				
 					return $inputFailures;
 				}
 
@@ -274,30 +273,27 @@ class Student{
 	 * @return mixed in case of success an int (the student's id) is returned. Otherwise a list failures is returned.
 	 *
 	 * @todo The adding of scores relies only on the student's familyname and givenname. Thus, the rare case that two students share the same name pair is unacceptable. We therefore should check for this case and if necessary automatically change the second student's name by adding some numbering in order ok making the names unique.
-	 * @todo Validation of the input had to be removed since ereg is no longer available.
      */
 	public static function addStudent($familyname,$givenname,$matrnr,$term,$email,$course,$ingroup){
 		// We check the format of the given arguments.
 		// Whenever the check of a filed failed, 
 		$inputFailures = array();
-		// ereg was removed! currently there is no validation at all!
-/*		if(!ereg('^[a-zA-Z0-9._-]+@[a-zA-Z0-9-]+.[a-zA-Z.]{2,25}$', $email)){
+		if(preg_match('/^[a-zA-Z0-9._-]+@[a-zA-Z0-9-]+.[a-zA-Z.]{2,25}$/', $email)==0){
 			$inputFailures[] = "email";
 		}
-
-		if(!ereg('^[a-zA-ZÄÖÜäöüßÈèÉé-]+$', $familyname)){
+		if(preg_match('/^[a-zA-ZÄÖÜäöüßÈèÉé-]+$/', $familyname)==0){
 			$inputFailures[] = "familyname";
 		}
-		if(!ereg('^[a-zA-ZÄÖÜäöüßÈèÉé-]+$', $givenname)){
+		if(preg_match('/^[a-zA-ZÄÖÜäöüßÈèÉé-]+$/', $givenname)==0){
 			$inputFailures[] = "givenname";
 		}
-		if(!ereg('^[0-9]+$', $matrnr)){
+		if(preg_match('/^[0-9]+$/', $matrnr)==0){
 			$inputFailures[] = "matrnr";
 		}
-		if(!ereg('^[0-9]+$', $term)){
+		if(preg_match('/^[0-9]+$/', $term)==0){
 			$inputFailures[] = "term";
 		}
-*/		// TODO: Check validity of the course data
+		// TODO: Check validity of the course data
 		/*if(!ereg('^[a-zA-Z0-9ÄÖÜäöüßÈèÉé]+$', $course)){
 			$inputFailures[] = "course";
 		}*/
