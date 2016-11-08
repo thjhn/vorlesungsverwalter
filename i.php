@@ -401,8 +401,15 @@ switch($cmd){
 		print($curGroup->getGroupJson());
 		break;
 
+	///////////////////////////////////////////////////////////////
+	// Edit a specific group.
+	// $data contains the id of the group in question and the
+	// new data.
+	// If the groupid equals _new a new group is created first.
+	// 
+	// Roles required: admin
 	case 'EDIT_GROUP':
-		Logger::log("Interface got 'EDIT_GROUP' with data $data.",Logger::LOGLEVEL_VERBOSE);
+		Logger::log("Interface got 'EDIT_GROUP'.",Logger::LOGLEVEL_VERBOSE);
 		if($AUTH->hasRole("admin")){
 			// ex ante we assume that the following operations will be successfull
 			$success = true;
@@ -428,7 +435,7 @@ switch($cmd){
 				print("{\"success\":\"no\",\"errormsg\":\"".$errormsg."\"}");
 			}
 		}else{
-			Logger::log("Interface got 'EDIT_GROUP' with data $data but the user was not allowed to call this command.",Logger::LOGLEVEL_ERROR);
+			Logger::log("Interface got 'EDIT_GROUP' but the user was not allowed to call this command.",Logger::LOGLEVEL_ERROR);
 			print("{\"success\":\"no\",\"errormsg\":\"Schwerwiegender interner Fehler. Keine Eintragungen wurden gespeichert!\"}");
 		}
 		break;

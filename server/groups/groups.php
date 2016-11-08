@@ -98,7 +98,7 @@ class Groups{
 			// Check for existence?
 			return $this->groupnode->getAttribute($fieldname);
 		}else{
-			Logger::log("gropus.php method getField was called for a nonexisting group.",Logger::LOGLEVEL_ERROR);
+			Logger::log("groups.php method getField was called for a nonexisting group.",Logger::LOGLEVEL_ERROR);
 			return FALSE;
 		}
 	}
@@ -133,7 +133,9 @@ class Groups{
 		if($this->editable){
 			if($this->groupid != ""){
 				for($i=0;$i<count($changes);$i++){
-					$node = $this->groupnode->setAttribute($changes[$i]['field'],$changes[$i]['newvalue']);
+					if($changes[$i]['field'] != 'groupid'){
+						$node = $this->groupnode->setAttribute($changes[$i]['field'],$changes[$i]['newvalue']);
+					}
 				}
 				$this->dataset->save();
 				return true;

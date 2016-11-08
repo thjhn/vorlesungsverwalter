@@ -181,7 +181,7 @@ class Student{
 				// We check the format of the given arguments.
 				// Whenever the check of a field failed, 
 				$inputFailures = array();
-				if(preg_match('/^[a-zA-Z0-9._-]+@[a-zA-Z0-9-]+.[a-zA-Z.]{2,25}$/', $email)==0){
+				if(!filter_var($email, FILTER_VALIDATE_EMAIL)){
 					$inputFailures[] = "email";
 				}
 				if(preg_match('/^[a-zA-ZÄÖÜäöüßÈèÉé-]+$/', $familyname)==0){
@@ -278,7 +278,7 @@ class Student{
 		// We check the format of the given arguments.
 		// Whenever the check of a filed failed, 
 		$inputFailures = array();
-		if(preg_match('/^[a-zA-Z0-9._-]+@[a-zA-Z0-9-]+.[a-zA-Z.]{2,25}$/', $email)==0){
+		if(!filter_var($email, FILTER_VALIDATE_EMAIL)){
 			$inputFailures[] = "email";
 		}
 		if(preg_match('/^[a-zA-ZÄÖÜäöüßÈèÉé-]+$/', $familyname)==0){

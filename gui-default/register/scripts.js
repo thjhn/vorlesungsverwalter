@@ -95,7 +95,7 @@ $("#register_btn_submit").on('click',function(e){
 			"\"matrnr\":\""+$(".register_registerform input[name=matrnr]").attr('value')+"\","+
 			"\"term\":\""+$(".register_registerform input[name=term]").attr('value')+"\","+
 			"\"email\":\""+$(".register_registerform input[name=email]").attr('value')+"\","+
-			"\"ingroup\":\""+$(".register_registerform input[name=group]").attr('value')+"\","+
+			"\"ingroup\":\""+$(".register_registerform input[name=group]:checked").attr('value')+"\","+
 			"\"course\":\""+$(".register_registerform select[name=course] option:selected").attr('value')+"\""+
 			"}"
 		}
