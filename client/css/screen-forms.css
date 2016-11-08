@@ -80,3 +80,19 @@
 .enterscores_anamebox button{
 margin:5px;
 }
+
+table thead tr{
+	background-color:#ddffdd;
+}
+table thead tr th{
+	text-align:left;
+}
+table tbody tr{
+	background-color:#ddffdd;	
+}
+table tbody tr:nth-child(odd){
+	background-color:#ddeedd;
+}
+table td{
+	padding:3px;
+}

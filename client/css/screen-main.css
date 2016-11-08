@@ -182,6 +182,9 @@ table.colored td{
 }
 
 
+#panel>.container>table{
+	margin:5px;
+}
 
 #footer{
 	/* position and size */
