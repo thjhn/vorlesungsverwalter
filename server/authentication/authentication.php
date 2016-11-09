@@ -71,65 +71,37 @@ class Authentication{
 
 	// Trys to login the users.
 	function login($username, $password){
-		$users = new Dataset("users",false);
-		// we look for the user $username:
-		$found_userbyname = false;
-		$checked_password = false;
-		foreach($users->dom->getElementsByTagName("user") as $cur_user){
-			$namenodes = $cur_user->getElementsByTagName("username");
-			if($namenodes->length == 1){
-				if($namenodes->item(0)->nodeValue == $username){
-					$found_userbyname = true;
-					$passwordnodes = $cur_user->getElementsByTagName("privkeykey");
-					if($passwordnodes->length == 1){
-						// we encrypt the private key key with the password provided by the user.
-						// if this is successfull the user will be logged in.
-						$decrypted_privkeykey = Crypto::decrypt_privkeykey($passwordnodes->item(0)->nodeValue,$password);
-						if(!($decrypted_privkeykey === FALSE)){
-							// user's password is correct
-							$checked_password = true;
-							$this->logged_in = true;
-							$this->username = $username;
-							$this->privkeykey = $decrypted_privkeykey;
-							
-							// load the user's real name
-							$realnames = $cur_user->getElementsByTagName("realname");
-							if($realnames->length > 0){
-								$this->realname = $realnames->item(0)->nodeValue;
-							}else{
-								$this->realname = "unknown";
-							}
+		// load user and check for success:
+		$user = new Users($username,False);
+		if($user->username != $username){
+			return "{\"success\":\"no1\"}";
+		}
 
-							// load the user's roles
-
-							$this->roles="";
-							foreach($cur_user->getElementsByTagName("roles") as $rolenode){
-								foreach($rolenode->getElementsByTagName("role") as $role){
-									$this->roles .= $role->nodeValue.";";
-								}
-							}
-
-							$_SESSION['logged_in']=true;
-							$_SESSION['remote_addr']=$_SERVER['REMOTE_ADDR'];
-							$_SESSION['username']=$username;
-							$_SESSION['realname']=$this->realname;
-							$_SESSION['roles']=$this->roles;
-							$_SESSION['privkeykey']=$this->privkeykey;
-						}else{
-							// the provided password is wrong
-							//TODO: to something with that information
-						}
-					}
-				}
-			}
+		// try to get the decrypted key.
+		$decrypted_privkeykey = $user->getDecryptedPrivKeyKey($password);
+		if($decrypted_privkeykey === False){
+			return "{\"success\":\"no2\"}";
 		}
 		
-		if(!$found_userbyname OR !$checked_password){
-			$e = openssl_decrypt(substr($pw,16),'aes256',$password,0,substr($pw,0,16)) === false;
-			echo "{\"success\":\"no\"}";
-		}else{
-			echo "{\"success\":\"yes\"}";
-		}
+
+		// now we passed the password barrier!
+		$this->privkeykey = $decrypted_privkeykey;
+		$this->logged_in = true;
+		$this->username = $username;
+		$this->realname = $user->getRealname();
+
+		// load the user's roles
+		$this->roles = $user->getRoleList();
+
+		// store everything in SESSIONS.		
+		$_SESSION['logged_in']=true;
+		$_SESSION['remote_addr']=$_SERVER['REMOTE_ADDR'];
+		$_SESSION['username']=$username;
+		$_SESSION['realname']=$this->realname;
+		$_SESSION['roles']=$this->roles;
+		$_SESSION['privkeykey']=$this->privkeykey;
+
+		return("{\"success\":\"yes\"}");
 	}
 
 	// Logout.

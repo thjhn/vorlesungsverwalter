@@ -22,12 +22,29 @@
  */
 
 include_once('server/logger/logger.php');
+/**
+ * The class Dataset is responsible for loading and strogin the
+ * XML-files which are in the data directory.
+ * 
+ * Each Dataset object loads a single XML-file and performs its
+ * operations on it.
+ * A $writable-flag allows to load the file in read-only or in 
+ * read/write mode.
+ *
+ * @author Thomas Jahn
+ *
+ */
 class Dataset{
-
-	var $dataset, $xml_file, $lock_file, $dom;
+	var $dataset, $xml_file, $lock_file, $dom, $loaded;
 
 	// Constructor. Load the dataset $dataset. If $writetable is true, it is possible to save changes in the DOM.
+	// It is recommended to check whether the $loaded variable was set to True after initialisation.	
 	function Dataset($dataset,$writeable){
+		// $dataset indicates the filename of the XML-file.
+		// we impose here that this filename (with the exception
+		// of the ending .xml) only contains lower-case letters
+		
+		$this->loaded = False; // indicates whether loading the dataset was successfull.
 		$this->dataset = $dataset;
 		$this->writeable = $writeable;
 		$this->xml_file = "data/".$dataset.".xml";
@@ -53,18 +70,17 @@ class Dataset{
 					// Let's load the DOM
 					$this->dom = new DOMDocument();
 					$this->dom->load($this->xml_file);
+					$this->loaded = True;
 				}else{
-					// We didn't get the lock; TODO: ERROR
 					Logger::log("dataset.php tried to get the lock for ".$this->xml_file." which failed.",Logger::LOGLEVEL_WARNING);
-					echo "sad";
 				}
 			}else{
 				// no, the requested lock does not exist
-				// TODO: ERROR				
+				Logger::log("dataset.php tried to get the lock for ".$this->xml_file." but lockfile does not exist.",Logger::LOGLEVEL_ERROR);
 			}
 		}else{
 			// no, the requested dataset does not exist
-			// TODO: ERROR
+			Logger::log("dataset.php tried to get the data from ".$this->xml_file." but this file does not exist.",Logger::LOGLEVEL_ERROR);
 		}
 	}
 
@@ -72,6 +88,29 @@ class Dataset{
 	function __destruct(){
 		flock($this->lock_file, LOCK_UN);
 		fclose($this->lock_file);
+	}
+
+
+	/**
+         * Find all $nodename nodes in the dom variable of the dataset that have
+         * the attribute $attribute_name set to $attribute_value
+         *
+         * @param $nodename The name of the nodes to find.
+         * @param $attribute_name the name of the attribute to look at
+         * @param attribute_value the required value of this attribute
+         *
+         * @return an array of matching nodes. In case of an error we return
+	 *   an empty array.
+	 */
+	function getNodeByAttribute($nodename, $attribute_name, $attribute_value){
+		$arr_to_return = array();
+		foreach($this->dom->getElementsByTagName($nodename) as $cur_node){
+			if($cur_node->getAttribute($attribute_name) == $attribute_value){
+				$arr_to_return[] = $cur_node;
+				break;
+			}
+		}
+		return $arr_to_return;
 	}
 
 	function save(){

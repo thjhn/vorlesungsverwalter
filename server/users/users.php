@@ -31,7 +31,7 @@ class Users{
 	var $username,$editable,$usernode;
 
 	/**
-     * The constructor loads the users using their username.
+         * The constructor loads the users using their username.
 	 * 
 	 * @param string $username The user's name
 	 * @param boolean $editable If 'true', the values are changeable. If 'false' they are read-only.
@@ -40,25 +40,31 @@ class Users{
 		$this->username = $username;
 		$this->editable = $editable;
 
-		// load the users-dataset
+		// load the users-dataset and then check whether this was successful.
 		$this->dataset = new Dataset("users",$this->editable);
-	
-		// find the users by username.
-		$matches = 0;
-		foreach($this->dataset->dom->getElementsByTagName("user") as $cur_user){
-			foreach($cur_user->getElementsByTagName("username") as $name){
-				if($name->nodeValue == $username){
-					// $cur_user is the student we were looking for
-					$matches++;
-					$this->usernode  = $cur_user;
-					break;
+		if(!$this->dataset->loaded){
+			$this->username = ""; // an empty username indicates that no data was loaded.
+			Logger::log("user.php tried to load user $username but dataset was not loaded properly. Giving up.",Logger::LOGLEVEL_ERROR);
+		}else{
+			$nodes_array = $this->dataset->getNodeByAttribute("user", "username", $username);
+			if( count($nodes_array)==0 ){
+				// we haven't found a matching node
+				$this->username = "";
+				Logger::log("user.php tried to load user $username but no matching node was found.",Logger::LOGLEVEL_VERBOSE);
+			}else{
+				// we assume that the array contains only one node. Thus we
+				// simply take the first one.
+				$this->usernode = $nodes_array[0];
+				
+				// since we already have loaded all matching nodes, we check
+				// whether there are more than one matching nodes:
+				if( count($nodes_array) > 1 ){
+					Logger::log("While loading user $username we noticed that there are multiple matching nodes.",Logger::LOGLEVEL_FATAL);
 				}
+
 			}
 		}
-		// if we haven't found that user
-		if($matches == 0){
-			$this->username = "";
-		}
+
 	}
 
 	/**
@@ -69,6 +75,7 @@ class Users{
 	 * @return mixed returns false if the required field is not present. It returns the value of the first node with that tagename else.
 	 *
 	 * @todo check whether loading a user was successfully before!
+	 * DEPRECATED.
 	*/
 	function getField($tagname){
 		$nodes = $this->usernode->getElementsByTagName($tagname);
@@ -78,6 +85,46 @@ class Users{
 			return FALSE;
 		}
 	}
+
+	/**
+         * Provides the user's decrypted privkey.
+	 *
+	 * @return the key or false if any error occurs.
+	 */
+	function getDecryptedPrivKeyKey($password){
+		if(!$this->loaded()) return false;
+		return Crypto::decrypt_privkeykey(
+			$this->usernode->getAttribute("privkeykey"),
+			$password
+		);
+	}
+
+
+	/**
+         * Provides the user's realname
+	 *
+	 * @return realname
+	 */
+	function getRealname(){
+		if(!$this->loaded()) return "";
+		return $this->usernode->getAttribute("realname");
+	}
+
+
+	/**
+         * Provides the semicolon separated list of the user's roles
+	 *
+	 * @return semicolon separated list of roles
+	 */
+	function getRoleList(){
+		if(!$this->loaded()) return "";
+		$rolelist = "";
+		foreach($this->usernode->getElementsByTagName("role") as $role){
+			$rolelist .= $role->getAttribute('rolename').";";
+		}
+		return $rolelist;
+	}
+
 
 	/**
 	 * Check whether the object contains data of an user
@@ -92,8 +139,9 @@ class Users{
 	 * Generates an array containing all the user's rolse.
 	 *
 	 * @return the generated array or false on error
+	 * @todo needs rewriting.
 	*/
-	private function getRoleList(){
+	private function getRoleListArray(){
 		if($this->username != ""){
 			$rolelist = array();
 			foreach($this->usernode->getElementsByTagName("role") as $role){
@@ -136,6 +184,7 @@ class Users{
 	 * @param $role a string containing the role's name.
 	 *
 	 * @return true or false.
+	 * @todo needs rewriting.
 	*/
 	function hasRole($role){
 		if($this->username != ""){
