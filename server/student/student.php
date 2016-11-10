@@ -203,7 +203,7 @@ class Student{
 
 				// try to load the group in order to verify its existence
 				$group = new Groups($ingroup);
-				if(!($group->isLoaded())){
+				if(!($group->loaded())){
 					$inputFailures[] = "ingroup";
 				}
 
@@ -246,7 +246,7 @@ class Student{
 				return [];
 			}else{
 				Logger::log("In student.php: Tried to save changes for a not existing student!",Logger::LOGLEVEL_ERROR);
-				return ["INTERNAL"];
+				return ["INTERNAL"];			
 			}
 		}else{
 			Logger::log("In student.php: Tried to save changes for student ".$this->uid." in read-only mode!",Logger::LOGLEVEL_ERROR);
@@ -366,7 +366,7 @@ class Student{
 
 
 	/**
-     * Generate a Json-list of students filtered by $query.
+	 * Generate a Json-list of students filtered by $query.
 	 *
 	 * Each item contains the field id containing the student's unique id and a field 'label' formated according to $format.
 	 * If $format=='FGM', the label is familyname, givenname (matrnr).  If $format=='FG', the label is familyname, givenname.

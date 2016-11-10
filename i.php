@@ -145,24 +145,23 @@ switch($cmd){
 	// Roles required: admin
 	// TODO: Error handling. I.e. the dataset could not be loaded.
 	case 'EDIT_REGISTRATIONSLOT':
-		Logger::log("Interface got 'EDIT_REGISTRATIONSLOT' with data $data.",Logger::LOGLEVEL_VERBOSE);
+		Logger::log("Interface got 'EDIT_REGISTRATIONSLOT'.",Logger::LOGLEVEL_VERBOSE);
 		if(!$AUTH->hasRole("admin")){
-			Logger::log("Interface got 'EDIT_REGISTRATIONSLOT' with data $data but the user was not allowed to call this 	command.",Logger::LOGLEVEL_ERROR);
+			Logger::log("Interface got 'EDIT_REGISTRATIONSLOT' but the user was not allowed to call this 	command.",Logger::LOGLEVEL_ERROR);
 			print("{\"success\":\"no\",\"errormsg\":\"Schwerwiegender interner Fehler.\"}");
 			break;
 		}
 
 		// check data integrity.
-		/*if(!ereg('^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}$', $data['start'])){
-			Logger::log("While handling 'EDIT_REGISTRATIONSLOT': data[start] is invalid.",Logger::LOGLEVEL_ERROR);
+		if(preg_match('/^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}$/', $data['start'])==0){
+			Logger::log("While handling 'EDIT_REGISTRATIONSLOT': ".$data['start']." is invalid.",Logger::LOGLEVEL_WARNING);
 			print("{\"success\":\"no\",\"errormsg\":\"Invalid data.\"}");
 			break;
-		}*/
-		/*if(!ereg('^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}$', $data['end'])){
-			Logger::log("While handling 'EDIT_REGISTRATIONSLOT': data[end] is invalid.",Logger::LOGLEVEL_ERROR);
+		}if(preg_match('/^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}$/', $data['end'])==0){
+			Logger::log("While handling 'EDIT_REGISTRATIONSLOT': ".$data['end']." is invalid.",Logger::LOGLEVEL_WARNING);
 			print("{\"success\":\"no\",\"errormsg\":\"Invalid data.\"}");
 			break;
-		}*/
+		}
 
 		$conf = new Dataset("config",true);
 
@@ -353,12 +352,11 @@ switch($cmd){
 	// Roles required: admin
 	// TODO: Send Permission error.
 	case 'LIST_ALL_STUDENTS_FGM':
-		// 
 		if($AUTH->hasRole("admin")){
 			Logger::log("Interface got 'LIST_ALL_STUDENTS_FGM'.",Logger::LOGLEVEL_VERBOSE);
 			print(Student::findStudentsJson("FGM",$data,$AUTH));
 		}else{
-			// TODO: Send Permission error.
+			Logger::log("Interface got 'LIST_ALL_STUDENTS_FGM'. But user was not allowed to call it.",Logger::LOGLEVEL_WARNING);
 		}
 		break;
 
@@ -559,6 +557,19 @@ switch($cmd){
 		break;
 
 
+	///////////////////////////////////////////////////////////////
+	// Edit a specific student.
+	// 
+	// data must be a JSON of the following format:
+	//   {"uid":<id>, "personal":<personal>,
+	//    "description":<description>, "seats":<seats>}
+	// where
+	//   <uid> is the student's id
+	//   <personal> is a JSON with the fields
+	//     course, email, familyname, givenname, ingroup, matrnr,
+	//     term
+	//
+	// Roles required: admin
 	case 'EDIT_STUDENT':
 		// Edit data of a specific student
 		Logger::log("Interface got 'EDIT_STUDENT' with data $data.",Logger::LOGLEVEL_VERBOSE);
@@ -742,7 +753,9 @@ switch($cmd){
 		print(Exams::getAllExamsJson());
 		break;
 
-
+	///////////////////////////////////////////////////////////////
+	// Check whether anonymous users can register.
+	// 
 	case 'IS_REGISTRATION_ALLOWED':
 		// check whether registration is allowed an if so get information about the current slot.
 		$conf = new Dataset("config",false);
@@ -764,6 +777,9 @@ switch($cmd){
 		}
 		break;
 
+	///////////////////////////////////////////////////////////////
+	// Show a list of all available courses.
+	// 
 	case 'LIST_COURSES':
 		$conf = new Dataset("config",false);
 		$studylist = array();
