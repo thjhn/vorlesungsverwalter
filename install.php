@@ -22,12 +22,11 @@
  *  It should be rewritten as soon as possible.
  */
 
-
-  function generateGroups(){
+  function generateEmptyXML($nodename){
     $out = "";
     $out .= "<?xml version=\"1.0\" standalone=\"yes\"?>\n";
-    $out .= "<groups>\n";
-    $out .= "</groups>\n";
+    $out .= "<$nodename>\n";
+    $out .= "</$nodename>\n";
     return $out;
   }
   function generateUser($username,$realname,$privkeykey){
@@ -115,8 +114,11 @@
     print("<h2>Testing</h2>");
     $errors = 0;
     $errors += checkFile("data/config.xml",True);
+    $errors += checkFile("data/exams.xml",True);
     $errors += checkFile("data/users.xml",True);
     $errors += checkFile("data/groups.xml",True);
+    $errors += checkFile("data/sheets.xml",True);
+    $errors += checkFile("data/students.xml",True);
     $errors += checkFile("data/",False);
     $errors += checkFile("keys/vv3privatekey.pem",True);
     $errors += checkFile("keys/vv3publickey.pem",True);
@@ -205,8 +207,29 @@
 	if(!$f){
           print("Was not able to write the groups file. Check whether data-directory is writable!");
         }else{
-          fwrite($f,generateGroups());
-          print("<p>Groups written.</p>");
+          fwrite($f,generateEmptyXML("groups"));
+          print("<p>Groups file written.</p>");
+        }
+        $f = fopen("data/sheets.xml","w");
+	if(!$f){
+          print("Was not able to write the sheets file. Check whether data-directory is writable!");
+        }else{
+          fwrite($f,generateEmptyXML("sheets"));
+          print("<p>Sheets file written.</p>");
+        }
+        $f = fopen("data/students.xml","w");
+	if(!$f){
+          print("Was not able to write the students file. Check whether data-directory is writable!");
+        }else{
+          fwrite($f,generateEmptyXML("students"));
+          print("<p>Students file written.</p>");
+        }
+        $f = fopen("data/exams.xml","w");
+	if(!$f){
+          print("Was not able to write the exams file. Check whether data-directory is writable!");
+        }else{
+          fwrite($f,generateEmptyXML("exams"));
+          print("<p>Exam file written.</p>");
         }
         print("<p>Installtion finished. <a href=\"index.html\">Go to your VV</a>.</p>");
 
