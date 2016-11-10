@@ -27,17 +27,7 @@
     $out = "";
     $out .= "<?xml version=\"1.0\" standalone=\"yes\"?>\n";
     $out .= "<users>\n";
-    $out .= "	<user>\n";
-    $out .= "		<username>$username</username>\n";
-    $out .= "		<realname>$realname</realname>\n";
-    $out .= "		<privkeykey>$privkeykey</privkeykey>\n";
-    $out .= "		<enabled>yes</enabled>\n";
-    $out .= "		<roles>\n";
-    $out .= "			<role>admin</role>\n";
-    $out .= "			<role>corrector</role>\n";
-    $out .= "			<role>team</role><role>dev</role>\n";
-    $out .= "		</roles>\n";
-    $out .= "	</user>\n";
+    $out .= "	<user username=\"$username\" realname=\"$realname\" privkeykey = \"$privkeykey\" enabled=\"true\" is_corrector=\"true\" is_admin=\"true\" is_dev=\"true\"/>\n";
     $out .= "</users>\n";
     return $out;
   }

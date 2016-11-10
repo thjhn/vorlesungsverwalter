@@ -50,27 +50,16 @@ $("#users_edit_dialog").dialog({
 	modal:true,
 	width:500,
 	buttons: {
-		"Speichern": function(){
-			// add each field that has to be changed to the changearray (except roles!)
-			var editarray = [];
-			$("#users_edit_dialog input[class=field_edited]").each(function(index){
-				editarray.push({field:$(this).attr("name"), newvalue:$(this).attr("value")});
-			});
-			$("#users_edit_dialog select[name=enabled] option:selected").each(function(index){
-				editarray.push({field:$(this).parent().attr("name"), newvalue:$(this).attr("value")});
-			});
+		"Speichern": function(){			
+			var dataobject = {
+				username:$("#users_edit_dialog input[name=username]").attr("value"),
+				realname:$("#users_edit_dialog input[name=realname]").attr("value"),
+				enabled:$("#users_edit_dialog select[name=enabled]  option:selected").attr("value"),
+				password:$("#users_edit_dialog input[name=password]").attr("value"),
+				is_corrector:$("#users_edit_dialog select[name=corrector]  option:selected").attr("value"),
+				is_admin:$("#users_edit_dialog select[name=admin]  option:selected").attr("value")
+			};
 
-			// generate the list of roles the user should be asigned to...
-			var rolearray = [];
-			if($("#users_edit_dialog").find("select[name=admin] option[value='yes']").attr("selected") == "selected" ){
-				rolearray.push("admin");
-			}
-			if($("#users_edit_dialog").find("select[name=corrector] option[value='yes']").attr("selected") == "selected" ){
-				rolearray.push("corrector");
-			}
-
-			var dataobject = {username:$("#users_edit_dialog input[name=username]").attr("value"), changes:editarray, roles:rolearray};
-console.log(dataobject);
 			$.ajax({
 				url:"i.php",
 				type:"POST",
@@ -90,12 +79,10 @@ console.log(dataobject);
 				$("#users_edit_dialog").dialog("close");
 				$("#users_changes_dialog").dialog("open");
 
-				$("#users_edit_dialog input").removeClass("field_edited");
 				$("#users_edit_dialog input[name=password]").attr("value","");
 			});
 		},
 		"Abbrechen": function(){
-			$("#users_edit_dialog input").removeClass("field_edited");
 			$( this ).dialog( "close" );
 		}
 	}
@@ -109,17 +96,14 @@ $("#users_add_dialog").dialog({
 	width:500,
 	buttons: {
 		"Speichern": function(){
-			// generate the list of roles the user should be asigned to...
-			var rolearray = [];
-			if($("#users_add_dialog").find("select[name=admin] option[value='yes']").attr("selected") == "selected" ){
-				rolearray.push("admin");
-			}
-			if($("#users_add_dialog").find("select[name=corrector] option[value='yes']").attr("selected") == "selected" ){
-				rolearray.push("corrector");
-			}
-
-			var dataobject = {username:$("#users_add_dialog input[name=username]").attr("value"), realname:$("#users_add_dialog input[name=realname]").attr("value"),enabled:$("#users_add_dialog select[name=enabled]  option:selected").attr("value"), password:$("#users_add_dialog input[name=password]").attr("value"), roles:rolearray, };
-console.log(dataobject);
+			var dataobject = {
+				username:$("#users_add_dialog input[name=username]").attr("value"),
+				realname:$("#users_add_dialog input[name=realname]").attr("value"),
+				enabled:$("#users_add_dialog select[name=enabled]  option:selected").attr("value"),
+				password:$("#users_add_dialog input[name=password]").attr("value"),
+				is_corrector:$("#users_add_dialog select[name=corrector]  option:selected").attr("value"),
+				is_admin:$("#users_add_dialog select[name=admin]  option:selected").attr("value")
+			};
 			$.ajax({
 				url:"i.php",
 				type:"POST",
@@ -139,12 +123,10 @@ console.log(dataobject);
 				$("#users_add_dialog").dialog("close");
 				$("#users_changes_dialog").dialog("open");
 
-				$("#users_edit_dialog input").removeClass("field_edited");
 				$("#users_edit_dialog input[name=password]").attr("value","");
 			});
 		},
 		"Abbrechen": function(){
-			$("#users_edit_dialog input").removeClass("field_edited");
 			$( this ).dialog( "close" );
 		}
 	}
@@ -187,13 +169,13 @@ function refreshUsersTable(){
 				var users_field_enabled = "<img src=\"client/icons/bullet_red.png\" alt=\"no\" title=\"Der Benutzer ist gesperrt und kann sich daher nicht anmelden.\">";
 			}
 
-			if($.inArray("corrector",data[i].rolelist) >= 0){
+			if(data[i].is_corrector=='yes'){
 				var users_field_corrector = "<img src=\"client/icons/bullet_green.png\" alt=\"yes\" title=\"Benutzer ist Korrektor.\">";
 			}else{
 				var users_field_corrector = "<img src=\"client/icons/bullet_red.png\" alt=\"no\" title=\"Benutzer ist kein Korrektor.\">";
 			}
 
-			if($.inArray("admin",data[i].rolelist) >= 0){
+			if(data[i].is_admin=='yes'){
 				var users_field_admin = "<img src=\"client/icons/bullet_green.png\" alt=\"yes\" title=\"Benutzer ist Admin.\">";
 			}else{
 				var users_field_admin = "<img src=\"client/icons/bullet_red.png\" alt=\"no\" title=\"Benutzer ist kein Admin.\">";
@@ -218,17 +200,16 @@ function refreshUsersTable(){
 					data:cur_username
 				}
 			}).done(function(data){
-				console.log(data);
 				if(data.success == 'yes'){
 					$("#users_edit_dialog").find("input[name=realname]").attr("value",data.realname);
 					$("#users_edit_dialog").find("select option").attr("selected","");
 
 					$("#users_edit_dialog").find("select[name=enabled] option[value='"+data.enabled+"']").attr("selected","selected");
 			
-					if($.inArray("admin",data.rolelist)>=0){
+					if(data.is_admin=="yes"){
 						$("#users_edit_dialog").find("select[name=admin] option[value='yes']").attr("selected","selected");
 					}
-					if($.inArray("corrector",data.rolelist)>=0){
+					if(data.is_corrector=="yes"){
 						$("#users_edit_dialog").find("select[name=corrector] option[value='yes']").attr("selected","selected");
 					}
 
@@ -238,12 +219,6 @@ function refreshUsersTable(){
 			});
 
 			$("#users_edit_dialog").find("input[name=username]").first().attr("value", cur_username );
-
-			// add an event handler
-			// we mark each field with changes by adding the class 'field_edited'
-			$("#users_edit_dialog input").on('change',function(e){
-				$(this).addClass("field_edited");
-			});
 
 			// open the dialog
 			$("#users_edit_dialog").dialog("open");

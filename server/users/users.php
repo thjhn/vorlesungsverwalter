@@ -72,10 +72,22 @@ class Users{
 	/**
 	 * Check whether the object contains data of an user
 	 *
-	 * @return bool
+	 * @return bool true if user was loaded correctly. else false
 	 */
 	public function loaded(){
 		return ($this->username != "");
+	}
+
+	/**
+	 * Save changes permanently.
+	 * 
+	 * @return bool true on success.
+	 */
+	function save(){
+		if(!$this->loaded()) return false;
+
+		$this->dataset->save();
+		return true;
 	}
 
 
@@ -105,16 +117,203 @@ class Users{
 		return $this->usernode->getAttribute("realname");
 	}
 
+	/**
+         * Set the user's realname
+	 * The changes are not stored permanently. Call save() to
+	 * actually store changes.
+	 * @param $realname the new value
+	 *
+	 * @return boolean true on success, false on failure
+	 */
+	function setRealname($realname){
+		if(!$this->loaded()) return False;
+		$this->usernode->setAttribute("realname",$realname);
+		return True;
+	}
+
 
 
 	/**
          * Is the user enabled?
 	 *
-	 * @return boolean state
+	 * @param $yesnoformated returns 'yes' and 'no' instead of bool val.
+	 *
+	 * @return boolean state or 'yes' and 'no' (see parameters)
 	 */
-	function getEnabled(){
+	function getEnabled($yesnoformated = False){
 		if(!$this->loaded()) return False;
-		return $this->usernode->getAttribute("enabled");
+
+		$state = $this->usernode->getAttribute("enabled");
+		if($yesnoformated){
+			if($state == 'true'){
+				return 'yes';
+			}else{
+				return 'no';
+			}
+		}else{
+			if($state == 'true'){
+				return true;
+			}else{
+				return false;
+			}
+		}
+
+	}
+
+	/**
+         * Set the user's enabled state
+	 * The changes are not stored permanently. Call save() to
+	 * actually store changes.
+	 * @param $state 'yes' or 'no'
+	 *
+	 * @return boolean true on success, false on failure
+	 */
+	function setEnabled($state){
+		if(!$this->loaded()) return False;
+		if($state == 'yes'){
+			$this->usernode->setAttribute("enabled","true");
+		}else{
+			$this->usernode->setAttribute("enabled","false");
+		}
+		return True;
+	}
+
+
+
+	/**
+         * Is the user a corrector?
+	 *
+	 * @param $yesnoformated returns 'yes' and 'no' instead of bool val.
+	 *
+	 * @return boolean state or 'yes' and 'no' (see parameters)
+	 */
+	function getIsCorrector($yesnoformated = False){
+		if(!$this->loaded()) return False;
+
+		$state = $this->usernode->getAttribute("is_corrector");
+		if($yesnoformated){
+			if($state == 'true'){
+				return 'yes';
+			}else{
+				return 'no';
+			}
+		}else{
+			if($state == 'true'){
+				return true;
+			}else{
+				return false;
+			}
+		}
+	}
+
+	/**
+         * Set the user's corrector state
+	 * The changes are not stored permanently. Call save() to
+	 * actually store changes.
+	 * @param $state 'yes' or 'no'
+	 *
+	 * @return boolean true on success, false on failure
+	 */
+	function setIsCorrector($state){
+		if(!$this->loaded()) return False;
+		if($state == 'yes'){
+			$this->usernode->setAttribute("is_corrector","true");
+		}else{
+			$this->usernode->setAttribute("is_corrector","false");
+		}
+		return True;
+	}
+
+
+
+	/**
+         * Is the user a developer?
+	 *
+	 * @param $yesnoformated returns 'yes' and 'no' instead of bool val.
+	 *
+	 * @return boolean state or 'yes' and 'no' (see parameters)
+	 */
+	function getIsDev($yesnoformated = False){
+		if(!$this->loaded()) return False;
+
+		$state = $this->usernode->getAttribute("is_dev");
+		if($yesnoformated){
+			if($state == 'true'){
+				return 'yes';
+			}else{
+				return 'no';
+			}
+		}else{
+			if($state == 'true'){
+				return true;
+			}else{
+				return false;
+			}
+		}
+	}
+
+
+
+	/**
+         * Is the user an admin?
+	 *
+	 * @param $yesnoformated returns 'yes' and 'no' instead of bool val.
+	 *
+	 * @return boolean state or 'yes' and 'no' (see parameters)
+	 */
+	function getIsAdmin($yesnoformated = False){
+		if(!$this->loaded()) return False;
+
+		$state = $this->usernode->getAttribute("is_admin");
+		if($yesnoformated){
+			if($state == 'true'){
+				return 'yes';
+			}else{
+				return 'no';
+			}
+		}else{
+			if($state == 'true'){
+				return true;
+			}else{
+				return false;
+			}
+		}
+	}
+
+	/**
+         * Set the user's admin state
+	 * The changes are not stored permanently. Call save() to
+	 * actually store changes.
+	 * @param $state 'yes' or 'no'
+	 *
+	 * @return boolean true on success, false on failure
+	 */
+	function setIsAdmin($state){
+		if(!$this->loaded()) return False;
+		if($state == 'yes'){
+			$this->usernode->setAttribute("is_admin","true");
+		}else{
+			$this->usernode->setAttribute("is_admin","false");
+		}
+		return True;
+	}
+
+
+	/**
+         * Set the user's privkeykey
+	 * The changes are not stored permanently. Call save() to
+	 * actually store changes.
+	 * @param $key the key
+	 * @param $auth an Authentication object to get the common key
+	 *
+	 * @return boolean true on success, false on failure
+	 */
+	function setPassword($key,$auth){
+		if(!$this->loaded()) return False;
+		$this->usernode->setAttribute('privkeykey',
+			Users::generatePrivKeyKey($key,$auth)
+		);
+		return true;
 	}
 
 
@@ -126,26 +325,16 @@ class Users{
 	 */
 	function getRoleList(){
 		if(!$this->loaded()) return "";
-		$rolelist = $this->getRoleListArray();
-		$roleliststring = "";
-		for($i = 0; $i<count($rolelist); $i++){
-			$roleliststring .= $rolelist[$i].";";
+
+		$rolelist = "";
+		if($this->getIsAdmin()){
+			$rolelist .= "admin;";
 		}
-		return $roleliststring;
-	}
-
-
-
-	/**
-	 * Generates an array containing all the user's rolse.
-	 *
-	 * @return the generated array. On an error it returns an empty array.
-	 */
-	private function getRoleListArray(){
-		if(!$this->loaded()) return "";
-		$rolelist = array();
-		foreach($this->usernode->getElementsByTagName("role") as $role){
-			$rolelist[] = $role->getAttribute('rolename');
+		if($this->getIsCorrector()){
+			$rolelist .= "corrector;";
+		}
+		if($this->getIsDev()){
+			$rolelist .= "dev;";
 		}
 		return $rolelist;
 	}
@@ -167,142 +356,15 @@ class Users{
 			$retstr .= "\"success\":\"yes\",";
 			$retstr .= "\"username\":\"".$this->username."\",";
 			$retstr .= "\"realname\":\"".$this->getRealname()."\",";
-			$retstr .= "\"rolelist\":".json_encode($this->getRoleListArray()).",";
-			if($this->getEnabled()){
-				$retstr .= "\"enabled\":\"yes\"";
-			}else{
-				$retstr .= "\"enabled\":\"no\"";
-			}
+			$retstr .= "\"is_corrector\":\"".$this->getIsCorrector(True)."\",";
+			$retstr .= "\"is_admin\":\"".$this->getIsAdmin(True)."\",";
+			$retstr .= "\"enabled\":\"".$this->getEnabled(True)."\"";
 			$retstr .= "}";
 			return $retstr;
+
 		}else{
 			// there is no student in this object
 			return "{\"success\":\"no\"}";
-		}
-	}
-
-
-
-	/**
-	 * Check whether the current user has a specific role.
-	 * 
-	 * @param $role a string containing the role's name.
-	 *
-	 * @return true or false.
-	 * @todo needs rewriting.
-	// No longer needed?
-	*/
-	/*function hasRole($role){
-		if($this->username != ""){
-			$rolelist = $this->getRoleList();
-			
-			for($i = 0; $i<count($rolelist); $i++){
-				if($rolelist[$i] == $role){
-					return true;
-				}
-			}
-		}
-		return false;
-	}*/
-
-
-
-	/**
-	 * Change certain values of that user
-	 * 
-	 * @param array $changes A list of changes to be made. Each item is an associative array with fields 'field' and 'newvalue'
-	 * @param $auth The current user's authentication object
-	 *
-	 * @return boolean Was saving changes successful?
-	 */
-	function saveChanges($changes,$auth){
-		Logger::log("users.php: saveChanges() called.",Logger::LOGLEVEL_VERBOSE);
-		if($this->editable){
-			if($this->username != ""){
-				for($i=0;$i<count($changes);$i++){
-					// if the password is the field that is to be changed, we do not save the password itself.
-					if($changes[$i]['field'] == 'password'){
-						Logger::log("users.php: saveChanges() was called for a password.",Logger::LOGLEVEL_VERBOSE);
-						$changes[$i]['field'] = 'privkeykey';
-						$changes[$i]['newvalue'] = Crypto::encrypt_privkeykey($changes[$i]['newvalue'],$auth);
-						if($changes[$i]['newvalue'] === false){
-							Logger::log("users.php; Failed encrypting privkeykey with a user's password",Logger::LOGLEVEL_ERROR);
-							return false;
-						}
-					}
-
-					$node = $this->usernode->getElementsByTagName($changes[$i]['field']);
-
-					if($node->length > 0){
-						if($node->length > 1){
-							Logger::log("There are more than one ".$changes[$i]['field']."-nodes for student ".$this->uid,Logger::LOGLEVEL_WARNING);
-						}
-
-						$node->item(0)->nodeValue = $changes[$i]['newvalue'];
-					}else{
-/*						$newnode = $this->dataset->dom->createElement($changes[$i]['field'],$changes[$i]['newvalue']);
-						$this->studentnode->appendChild($newnode);*/
-					}
-				}
-
-				$this->dataset->save();
-				return true;
-			}else{
-				Logger::log("Tried to save changes for a not existing student!",Logger::LOGLEVEL_ERROR);
-				return false;
-			}
-		}else{
-			Logger::log("Tried to save changes in read-only mode!",Logger::LOGLEVEL_ERROR);
-				return false;
-		}
-	}
-
-	/**
-	 * Assign the given roles to the user and remove all roles assigned previously..
-	 * 
-	 * @param array $roles A list of roles the user should be assigned to.
-	 *
-	 * @return boolean Was saving changes successful?
-	 */
-	function changeRoles($roles){
-		if($this->editable){
-			if($this->username != ""){
-				// Remove the old roles-node(s) and add a new one.
-				foreach($this->usernode->getElementsByTagName("roles") as $rolenode){
-					$rolenode->parentNode->removeChild($rolenode);
-				}
-				$newnode = $this->dataset->dom->createElement("roles");
-				$this->usernode->appendChild($newnode);
-
-				// Add the roles listed in $roles
-				// TODO: Check whether the entries are 'legal'
-				for($i=0;$i<count($roles);$i++){
-					$newrole = $this->dataset->dom->createElement("role",$roles[$i]);
-					$newnode->appendChild($newrole);
-				}
-
-
-					/*if($rolenode->length > 0){
-						if($node->length > 1){
-							Logger::log("There are more than one ".$changes[$i]['field']."-nodes for student ".$this->uid,Logger::LOGLEVEL_WARNING);
-						}
-
-						$node->item(0)->nodeValue = $changes[$i]['newvalue'];
-					}else{
-						$newnode = $this->dataset->dom->createElement($changes[$i]['field'],$changes[$i]['newvalue']);
-						$this->studentnode->appendChild($newnode);
-					}*/
-				
-
-				$this->dataset->save();
-				return true;
-			}else{
-				Logger::log("Tried to save changes for a not existing student!",Logger::LOGLEVEL_ERROR);
-				return false;
-			}
-		}else{
-			Logger::log("Tried to save changes in read-only mode!",Logger::LOGLEVEL_ERROR);
-				return false;
 		}
 	}
 
@@ -330,12 +392,13 @@ class Users{
 	 * @param string $username the new user's username
 	 * @param string $password the new user's password
 	 * @param string $realname the new user's real name
-	 * @param array $roles the roles of the new user
+	 * @param string $is_corrector yes/no indicates a corrector.
+	 * @param string $is_admin yes/no indicates an admin.
 	 * @param Auth $auth the current user's auth object.
 	 *
 	 * @todo add roles 
 	 */
-	public static function addNewUser($username, $password, $realname, $enabled, $roles, $auth){
+	public static function addNewUser($username, $password, $realname, $enabled, $is_corrector, $is_admin, $auth){
 		// before adding a new user we try to load it
 		$user = new Users($username,false);
 		if($user->loaded()){
@@ -354,17 +417,17 @@ class Users{
 		}else{
 			$nodeUser->setAttribute('enabled',"false");
 		}
-
-		for($i=0; $i<count($roles); $i++){
-			if(in_array($roles[$i],Users::ALLOWED_ROLES)){
-				$roleNode = $users->dom->createElement('role');
-				$roleNode->setAttribute("rolename",$roles[$i]);					
-				$nodeUser->appendChild($roleNode);
-			}else{
-		                Logger::log("Tried to add role ".$roles[$i]." while adding new user ".$username." but this role does not exist.",Logger::LOGLEVEL_WARNING);
-			}
+		if($is_admin == 'yes'){
+			$nodeUser->setAttribute('is_admin',"true");
+		}else{
+			$nodeUser->setAttribute('is_admin',"false");
 		}
-	
+		if($is_corrector == 'yes'){
+			$nodeUser->setAttribute('is_corrector',"true");
+		}else{
+			$nodeUser->setAttribute('is_corrector',"false");
+		}
+
 		$users->dom->childNodes->item(0)->appendChild($nodeUser);
 		$users->save();
                 Logger::log("Added a node for user $username to the users dataset.",Logger::LOGLEVEL_VERBOSE);
@@ -388,17 +451,21 @@ class Users{
 			// TODO Error handling
 			$item["username"] = $user->getAttribute("username");
 			$item["realname"] = $user->getAttribute("realname");
-			if($user->getAttribute("enabled")){
+			if($user->getAttribute("is_corrector")=="true"){
+				$item["is_corrector"] = "yes";
+			}else{
+				$item["is_corrector"] = "no";
+			}
+			if($user->getAttribute("is_admin")=="true"){
+				$item["is_admin"] = "yes";
+			}else{
+				$item["is_admin"] = "no";
+			}
+			if($user->getAttribute("enabled")=="true"){
 				$item["enabled"] = "yes";
 			}else{
 				$item["enabled"] = "no";
 			}
-
-			$rolelist = array();
-			foreach($user->getElementsByTagName("role") as $role){
-				$rolelist[] = $role->getAttribute("rolename");
-			}
-			$item["rolelist"] = $rolelist;
 
 			$list[] = $item;
 		}

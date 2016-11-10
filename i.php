@@ -633,7 +633,15 @@ switch($cmd){
 			break;
 		}
 
-		$fb = Users::addNewUser($data['username'], $data['password'], $data['realname'], $data['enabled'], $data['roles'], $AUTH);
+		$fb = Users::addNewUser(
+			$data['username'],
+			$data['password'],
+			$data['realname'],
+			$data['enabled'],
+			$data['is_corrector'],
+			$data['is_admin'],
+			$AUTH);
+
 		if($fb === true){
 			print("{\"success\":\"yes\"}");
 		}else{
@@ -642,11 +650,31 @@ switch($cmd){
 
 		break;
 
+	///////////////////////////////////////////////////////////////
+	// Edit an user.
+	// 
+	// data must be a JSON of the following format:
+	//   {"username":<username>, "realname":<realname>,
+	//    "password":<new_password>, "enabled":<enabled>,
+	//    "is_corrector":<is_corrector>, "is_admin":<is_admin>"}
+	// where
+	//   <username> is the id of the user to be edited
+	//   <realname> is the user's realname
+	//   <password> is the user's password. If empty the current password
+	//       will be kept.
+	//   <enabled> indicates whether the user can login (expected
+	//       values are 'yes' or 'no')
+	//   <is_corrector> indicates whether the user os a corrector
+	//       (expected values are 'yes' or 'no')
+	//   <is_admin> indicates whether the user os an admin (expected
+	//       values are 'yes' or 'no')
+	//
+	// Roles required: admin
 	case 'EDIT_USER':
 		// Edit data of a specific user
-		Logger::log("Interface got 'EDIT_USER' with data $data.",Logger::LOGLEVEL_VERBOSE);
+		Logger::log("Interface got 'EDIT_USER' for user ".$data['username'],Logger::LOGLEVEL_VERBOSE);
 		if(!$AUTH->hasRole("admin")){
-			Logger::log("Interface got 'EDIT_USER' with data $data but the user was not allowed to call this 	command.",Logger::LOGLEVEL_ERROR);
+			Logger::log("Interface got 'EDIT_USER' but the user was not allowed to call this 	command.",Logger::LOGLEVEL_ERROR);
 			print("{\"success\":\"no\",\"errormsg\":\"Schwerwiegender interner Fehler.\"}");
 			break;
 		}
@@ -654,10 +682,24 @@ switch($cmd){
 		$success = true;
 		$errormsg = "";
 
-		// first, change fields
+		// load user's current data
 		$user = new Users($data['username'],true);
+		if( !$user->loaded() ){ // check whether data was loaded
+			Logger::log("User ".$data['username']." not found. Interface could not handle 'EDIT_USER'.".Logger::LOGLEVEL_WARNING);
+			print("{\"success\":\"no\",\"errormsg\":\"Benutzer existiert nicht.\"}");
+			break;
+		}
 
-		if( !$user->saveChanges($data["changes"],$AUTH) ){
+		$user->setIsCorrector($data['is_corrector']);
+		$user->setIsAdmin($data['is_admin']);
+		$user->setEnabled($data['enabled']);
+		$user->setRealname($data['realname']);
+		if($data['password'] != ""){
+			$user->setPassword($data['password'],$AUTH);
+		}
+		$user->save(); // we should test for success.
+
+		/*if( !$user->saveChanges($data["changes"],$AUTH) ){
 			// at least one score change failed
 			$success = false;
 			$errormsg .= "Die Änderung persönlicher Informationen konnte nicht gespeichert werden. ";
@@ -667,7 +709,7 @@ switch($cmd){
 			$success = false;
 			$errormsg .= "Die Änderung persönlicher Informationen konnte nicht gespeichert werden. ";
 				}
-		}
+		}*/
 
 		// now its time to return sth.
 		if( $success ){
