@@ -620,11 +620,15 @@ switch($cmd){
 		print($user->getDataJson());
 		break;
 
+	///////////////////////////////////////////////////////////////
+	// Add a new user.
+	// 
+	// Roles required: admin
 	case 'ADD_USER':
 		// Get data of a specific student
-		Logger::log("Interface got 'ADD_USER' with data $data.",Logger::LOGLEVEL_VERBOSE);
+		Logger::log("Interface got 'ADD_USER'.",Logger::LOGLEVEL_VERBOSE);
 		if(!$AUTH->hasRole("admin")){
-			Logger::log("Interface got 'ADD_USER' with data $data but the user was not allowed to call this 	command.",Logger::LOGLEVEL_ERROR);
+			Logger::log("Interface got 'ADD_USER' but the user was not allowed to call this command.",Logger::LOGLEVEL_ERROR);
 			print("{\"success\":\"no\",\"errormsg\":\"Schwerwiegender interner Fehler.\"}");
 			break;
 		}

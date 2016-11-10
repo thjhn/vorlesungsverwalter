@@ -29,6 +29,7 @@
  */
 class Users{
 	var $username,$editable,$usernode;
+	const ALLOWED_ROLES = ['dev','admin','corrector'];
 
 	/**
          * The constructor loads the users using their username.
@@ -64,27 +65,20 @@ class Users{
 
 			}
 		}
-
 	}
+
+
 
 	/**
-     * Try to get the value of a field.
-	 * 
-	 * @param string $tagname The name of the field.
+	 * Check whether the object contains data of an user
 	 *
-	 * @return mixed returns false if the required field is not present. It returns the value of the first node with that tagename else.
-	 *
-	 * @todo check whether loading a user was successfully before!
-	 * DEPRECATED.
-	*/
-	function getField($tagname){
-		$nodes = $this->usernode->getElementsByTagName($tagname);
-		if($nodes->length > 0){
-			return $nodes->item(0)->nodeValue;
-		}else{
-			return FALSE;
-		}
+	 * @return bool
+	 */
+	public function loaded(){
+		return ($this->username != "");
 	}
+
+
 
 	/**
          * Provides the user's decrypted privkey.
@@ -100,6 +94,7 @@ class Users{
 	}
 
 
+
 	/**
          * Provides the user's realname
 	 *
@@ -111,6 +106,19 @@ class Users{
 	}
 
 
+
+	/**
+         * Is the user enabled?
+	 *
+	 * @return boolean state
+	 */
+	function getEnabled(){
+		if(!$this->loaded()) return False;
+		return $this->usernode->getAttribute("enabled");
+	}
+
+
+
 	/**
          * Provides the semicolon separated list of the user's roles
 	 *
@@ -118,43 +126,34 @@ class Users{
 	 */
 	function getRoleList(){
 		if(!$this->loaded()) return "";
-		$rolelist = "";
+		$rolelist = $this->getRoleListArray();
+		$roleliststring = "";
+		for($i = 0; $i<count($rolelist); $i++){
+			$roleliststring .= $rolelist[$i].";";
+		}
+		return $roleliststring;
+	}
+
+
+
+	/**
+	 * Generates an array containing all the user's rolse.
+	 *
+	 * @return the generated array. On an error it returns an empty array.
+	 */
+	private function getRoleListArray(){
+		if(!$this->loaded()) return "";
+		$rolelist = array();
 		foreach($this->usernode->getElementsByTagName("role") as $role){
-			$rolelist .= $role->getAttribute('rolename').";";
+			$rolelist[] = $role->getAttribute('rolename');
 		}
 		return $rolelist;
 	}
 
 
-	/**
-	 * Check whether the object contains data of an user
-	 *
-	 * @return bool
-	*/
-	public function loaded(){
-		return ($this->username != "");
-	}
 
 	/**
-	 * Generates an array containing all the user's rolse.
-	 *
-	 * @return the generated array or false on error
-	 * @todo needs rewriting.
-	*/
-	private function getRoleListArray(){
-		if($this->username != ""){
-			$rolelist = array();
-			foreach($this->usernode->getElementsByTagName("role") as $role){
-				$rolelist[] = $role->nodeValue;
-			}	
-			return $rolelist;
-		}else{
-			return false;
-		}
-	}
-
-	/**
-     * Get most of the data about the User as a Json-object.
+         * Get most of the data about the User as a Json-object.
 	 * 
 	 * The Json contains a field 'success' which is 'yes' if there is a student loaded. It is 'no' else.
 	 *
@@ -167,9 +166,13 @@ class Users{
 			$retstr  = "{";
 			$retstr .= "\"success\":\"yes\",";
 			$retstr .= "\"username\":\"".$this->username."\",";
-			$retstr .= "\"realname\":\"".$this->getField("realname")."\",";
-			$retstr .= "\"rolelist\":".json_encode($rolelist).",";
-			$retstr .= "\"enabled\":\"".$this->getField("enabled")."\"";
+			$retstr .= "\"realname\":\"".$this->getRealname()."\",";
+			$retstr .= "\"rolelist\":".json_encode($this->getRoleListArray()).",";
+			if($this->getEnabled()){
+				$retstr .= "\"enabled\":\"yes\"";
+			}else{
+				$retstr .= "\"enabled\":\"no\"";
+			}
 			$retstr .= "}";
 			return $retstr;
 		}else{
@@ -178,15 +181,18 @@ class Users{
 		}
 	}
 
+
+
 	/**
-     * Check whether the current user has a specific role.
+	 * Check whether the current user has a specific role.
 	 * 
 	 * @param $role a string containing the role's name.
 	 *
 	 * @return true or false.
 	 * @todo needs rewriting.
+	// No longer needed?
 	*/
-	function hasRole($role){
+	/*function hasRole($role){
 		if($this->username != ""){
 			$rolelist = $this->getRoleList();
 			
@@ -197,7 +203,9 @@ class Users{
 			}
 		}
 		return false;
-	}
+	}*/
+
+
 
 	/**
 	 * Change certain values of that user
@@ -298,6 +306,24 @@ class Users{
 		}
 	}
 
+
+
+	/**
+	 * Generate a privkeykey.
+	 * Encrypt the common key (which is taken from $auth)
+	 * with the given password.
+	 * 
+	 * @param $password the password to be used
+	 * @param $auth the authentication object
+	 *
+	 * @return the generated privkeykey
+	 */
+	public static function generatePrivKeyKey($password,$auth){
+		return Crypto::encrypt_privkeykey($password,$auth);
+	}
+
+
+
 	/**
 	 * Adds a new user.
 	 * 
@@ -306,8 +332,9 @@ class Users{
 	 * @param string $realname the new user's real name
 	 * @param array $roles the roles of the new user
 	 * @param Auth $auth the current user's auth object.
-	 * 
-	*/
+	 *
+	 * @todo add roles 
+	 */
 	public static function addNewUser($username, $password, $realname, $enabled, $roles, $auth){
 		// before adding a new user we try to load it
 		$user = new Users($username,false);
@@ -319,33 +346,31 @@ class Users{
 		// load the users-dataset
 		$users = new Dataset("users",true);
 		$nodeUser = $users->dom->createElement('user');
-		$nodeUserName = $users->dom->createElement('username');
-		$nodeUserName->nodeValue = $username;
-		$nodeUser->appendChild($nodeUserName);
-		$nodeUserName = $users->dom->createElement('realname');
-		$nodeUserName->nodeValue = $realname;
-		$nodeUser->appendChild($nodeUserName);
-		$nodeEnabled = $users->dom->createElement('enabled');
-		$nodeEnabled->nodeValue = $enabled;
-		$nodeUser->appendChild($nodeEnabled);
-		$nodeUserName = $users->dom->createElement('privkeykey');
-		$nodeUser->appendChild($nodeUserName);
-		$nodeUserName = $users->dom->createElement('roles');
-		$nodeUser->appendChild($nodeUserName);
-		
+		$nodeUser->setAttribute('username',$username);
+		$nodeUser->setAttribute('realname',$realname);
+		$nodeUser->setAttribute('privkeykey',Users::generatePrivKeyKey($password,$auth));
+		if($enabled == 'yes'){
+			$nodeUser->setAttribute('enabled',"true");
+		}else{
+			$nodeUser->setAttribute('enabled',"false");
+		}
+
+		for($i=0; $i<count($roles); $i++){
+			if(in_array($roles[$i],Users::ALLOWED_ROLES)){
+				$roleNode = $users->dom->createElement('role');
+				$roleNode->setAttribute("rolename",$roles[$i]);					
+				$nodeUser->appendChild($roleNode);
+			}else{
+		                Logger::log("Tried to add role ".$roles[$i]." while adding new user ".$username." but this role does not exist.",Logger::LOGLEVEL_WARNING);
+			}
+		}
+	
 		$users->dom->childNodes->item(0)->appendChild($nodeUser);
 		$users->save();
                 Logger::log("Added a node for user $username to the users dataset.",Logger::LOGLEVEL_VERBOSE);
-
-		// before loading the user again we have to free the lock!
-		unset($users);
-
-		$user = new Users($username,true);
-		$user->changeRoles($roles);
-		$user->saveChanges([array("field"=>"password", "newvalue"=>$password)],$auth);
-
 		return true;
 	}
+
 
 
 	/**
