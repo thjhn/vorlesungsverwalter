@@ -396,49 +396,61 @@ switch($cmd){
 	// Roles required: none
 	// TODO: Use JSON input!
 	case 'GET_GROUP_JSON':
-		Logger::log("Interface got 'GET_GROUP_JSON' with data $data.",Logger::LOGLEVEL_VERBOSE);
+		Logger::log("Interface got 'GET_GROUP_JSON'.",Logger::LOGLEVEL_VERBOSE);
 		$curGroup = new Groups($data);
 		print($curGroup->getGroupJson());
 		break;
 
+
 	///////////////////////////////////////////////////////////////
 	// Edit a specific group.
-	// $data contains the id of the group in question and the
-	// new data.
-	// If the groupid equals _new a new group is created first.
+	/// If groupid equals _new a new group is generated.
 	// 
+	// data must be a JSON of the following format:
+	//   {"groupid":<groupid>, "name":<name>,
+	//    "description":<description>, "seats":<seats>}
+	// where
+	//   <groupid> is the id of the group
+	//   <name> is the groups's name
+	//   <description> is a description of this group
+	//   <seats> is the number of seats in this group
+	//
 	// Roles required: admin
 	case 'EDIT_GROUP':
 		Logger::log("Interface got 'EDIT_GROUP'.",Logger::LOGLEVEL_VERBOSE);
-		if($AUTH->hasRole("admin")){
-			// ex ante we assume that the following operations will be successfull
-			$success = true;
-			$errormsg = "";
-			// if the groupid equals _new, we are asked to add a new group.
-			if($data['groupid'] == "_new"){
-			$newid = Groups::addGroup();
-				$group = new Groups($newid,true);
-			}else{
-				$group = new Groups($data['groupid'],true);
-			}
-			// now, save changes
-			if( !$group->saveChanges($data["changes"]) ){
-				// at least one score change failed
-				$success = false;
-				$errormsg .= "Die Änderung persönlicher Informationen konnte nicht gespeichert werden. ";
-			}
+		if(!$AUTH->hasRole("admin")){
+			Logger::log("Interface got 'EDIT_USER' but the user was not allowed to call this command.",Logger::LOGLEVEL_ERROR);
+			print("{\"success\":\"no\",\"errormsg\":\"Schwerwiegender interner Fehler.\"}");
+			break;
+		}
 
-			// now its time to return sth.
-			if( $success ){
-				print("{\"success\":\"yes\"}");
-			}else{
-				print("{\"success\":\"no\",\"errormsg\":\"".$errormsg."\"}");
-			}
+		if($data['groupid'] == "_new"){
+			Groups::addGroup($data['name'], $data['description'], $data['seats']);
+			print("{\"success\":\"yes\"}");
+			break;
+		}
+
+		// load user's current data
+		$group = new Groups($data['groupid'],true);
+		if( !$group->loaded() ){ // check whether data was loaded
+			Logger::log("Group ".$data['groupid']." not found. Interface could not handle 'EDIT_GROUP'.".Logger::LOGLEVEL_WARNING);
+			print("{\"success\":\"no\",\"errormsg\":\"Gruppe existiert nicht.\"}");
+			break;
+		}
+
+		$group->setName($data['name']);
+		$group->setDescription($data['description']);
+		$group->setSeats($data['seats']);		
+
+		// now its time to return sth.
+		if( $group->save() ){
+			print("{\"success\":\"yes\"}");
 		}else{
-			Logger::log("Interface got 'EDIT_GROUP' but the user was not allowed to call this command.",Logger::LOGLEVEL_ERROR);
-			print("{\"success\":\"no\",\"errormsg\":\"Schwerwiegender interner Fehler. Keine Eintragungen wurden gespeichert!\"}");
+			print("{\"success\":\"no\",\"errormsg\":\"".$errormsg."\"}");
 		}
 		break;
+
+
 
 
 	case 'LIST_ALL_STUDENTS_SCORES':
@@ -698,18 +710,6 @@ switch($cmd){
 			$user->setPassword($data['password'],$AUTH);
 		}
 		$user->save(); // we should test for success.
-
-		/*if( !$user->saveChanges($data["changes"],$AUTH) ){
-			// at least one score change failed
-			$success = false;
-			$errormsg .= "Die Änderung persönlicher Informationen konnte nicht gespeichert werden. ";
-		}else{
-			if( !$user->changeRoles($data["roles"]) ){
-			// something went wrong while changing the assigned roles.
-			$success = false;
-			$errormsg .= "Die Änderung persönlicher Informationen konnte nicht gespeichert werden. ";
-				}
-		}*/
 
 		// now its time to return sth.
 		if( $success ){

@@ -26,12 +26,12 @@ $("#groups_edit_dialog").dialog({
 	width:500,
 	buttons: {
 		"Speichern": function(){
-			var editarray = [];
-			$("#groups_edit_dialog input[class=field_edited]").each(function(index){
-				editarray.push({field:$(this).attr("name"), newvalue:$(this).attr("value")});
-			});
-			var editscorearray = [];
-			var dataobject = {groupid:$("#groups_edit_dialog input[name=groupid]").attr("value"), changes:editarray};
+			var dataobject = {
+				groupid:$("#groups_edit_dialog input[name=groupid]").attr("value"),
+				name:$("#groups_edit_dialog input[name=name]").attr("value"),
+				description:$("#groups_edit_dialog input[name=description]").attr("value"),
+				seats:$("#groups_edit_dialog input[name=seats]").attr("value")
+			};
 			$.ajax({
 				url:"i.php",
 				type:"POST",
@@ -103,9 +103,6 @@ $("#groups_addgroup").on('click',function(e){
 	$("#groups_edit_dialog input[name=name]").attr("value","");
 	$("#groups_edit_dialog input[name=description]").attr("value","");
 	$("#groups_edit_dialog input[name=seats]").attr("value","inf");
-
-	// we mark each field with changes by adding the class 'field_edited'
-	$("#groups_edit_dialog input").addClass("field_edited");
 });
 
 
@@ -158,18 +155,11 @@ function refreshGroupsTable(){
 					data:groupid
 				}
 			}).done(function(data){
-				console.log(data);
 				if(data.success == 'yes'){
 					$("#groups_edit_dialog input[name=groupid]").attr("value",data.groupid);
 					$("#groups_edit_dialog input[name=name]").attr("value",data.name);
 					$("#groups_edit_dialog input[name=description]").attr("value",data.description);
 					$("#groups_edit_dialog input[name=seats]").attr("value",data.seats);
-
-					// we mark each field with changes by adding the class 'field_edited'
-					$("#groups_edit_dialog input").on('change',function(e){
-						$(this).addClass("field_edited");
-					});
-
 
 					// open the dialog.
 					$("#groups_edit_dialog").dialog("open");

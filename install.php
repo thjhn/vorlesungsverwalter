@@ -23,6 +23,13 @@
  */
 
 
+  function generateGroups(){
+    $out = "";
+    $out .= "<?xml version=\"1.0\" standalone=\"yes\"?>\n";
+    $out .= "<groups>\n";
+    $out .= "</groups>\n";
+    return $out;
+  }
   function generateUser($username,$realname,$privkeykey){
     $out = "";
     $out .= "<?xml version=\"1.0\" standalone=\"yes\"?>\n";
@@ -109,6 +116,7 @@
     $errors = 0;
     $errors += checkFile("data/config.xml",True);
     $errors += checkFile("data/users.xml",True);
+    $errors += checkFile("data/groups.xml",True);
     $errors += checkFile("data/",False);
     $errors += checkFile("keys/vv3privatekey.pem",True);
     $errors += checkFile("keys/vv3publickey.pem",True);
@@ -180,20 +188,28 @@
         $privkeykey = base64_encode($iv.$crypttext);
         $f = fopen("data/users.xml","w");
         if(!$f){
-          print("Was not able to write the config file. Check whether data-directory is writable!");
+          print("Was not able to write the users file. Check whether data-directory is writable!");
         }else{
           fwrite($f,generateUser($_POST['username'],$_POST['lecturer'],$privkeykey));              
           fclose($f);
           print("<p>Users file written.</p>");
-          $f = fopen("data/config.xml","w");
-	  if(!$f){
-            print("Was not able to write the config file. Check whether data-directory is writable!");
-          }else{
-            fwrite($f,generateConfig($_POST['title'],$_POST['term'],$_POST['lecturer'],$_POST['sheets'],$_POST['courses']));
-            print("<p>Config written.</p>");
-           print("<p>Installtion finished. <a href=\"index.html\">Go to your VV</a>.</p>");
-          }
         }
+        $f = fopen("data/config.xml","w");
+	if(!$f){
+          print("Was not able to write the config file. Check whether data-directory is writable!");
+        }else{
+          fwrite($f,generateConfig($_POST['title'],$_POST['term'],$_POST['lecturer'],$_POST['sheets'],$_POST['courses']));
+          print("<p>Config written.</p>");
+        }
+        $f = fopen("data/groups.xml","w");
+	if(!$f){
+          print("Was not able to write the groups file. Check whether data-directory is writable!");
+        }else{
+          fwrite($f,generateGroups());
+          print("<p>Groups written.</p>");
+        }
+        print("<p>Installtion finished. <a href=\"index.html\">Go to your VV</a>.</p>");
+
       }
     }
     break;  	 

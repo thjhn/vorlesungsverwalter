@@ -30,7 +30,7 @@ class Groups{
 	var $groupid,$editable,$groupnode;
 
 	/**
-     * The constructor loads the group using its unique id.
+         * The constructor loads the group using its unique id.
 	 * 
 	 * @param string $groupid The groups's id
 	 * @param boolean $editable If 'true', the values are changeable. If 'false' they are read-only.
@@ -39,39 +39,159 @@ class Groups{
 		$this->groupid = $groupid;
 		$this->editable = $editable;
 
-		// load the users-dataset
+		// load the groups-dataset and then check whether this was successful.
 		$this->dataset = new Dataset("groups",$this->editable);
-	
-		// find the group by id.
-		$matches = 0;
-		foreach($this->dataset->dom->getElementsByTagName("group") as $cur_group){
-			if($cur_group->getAttribute('id') == $groupid){
-				// $cur_group is the group we were looking for
-				$matches++;
-				$this->groupnode  = $cur_group;
-				break;
+		if(!$this->dataset->loaded){
+			$this->groupid = ""; // an empty groupid indicates that no data was loaded.
+			Logger::log("groups.php tried to load group $groupid but dataset was not loaded properly. Giving up.",Logger::LOGLEVEL_ERROR);
+		}else{
+			$nodes_array = $this->dataset->getNodeByAttribute("group", "id", $groupid);
+			if( count($nodes_array)==0 ){
+				// we haven't found a matching node
+				$this->groupid = "";
+				Logger::log("groups.php tried to load group $groupid but no matching node was found.",Logger::LOGLEVEL_VERBOSE);
+			}else{
+				// we assume that the array contains only one node. Thus we
+				// simply take the first one.
+				$this->groupnode = $nodes_array[0];
+				
+				// since we already have loaded all matching nodes, we check
+				// whether there are more than one matching nodes:
+				if( count($nodes_array) > 1 ){
+					Logger::log("While loading group $gropuid we noticed that there are multiple matching nodes.",Logger::LOGLEVEL_FATAL);
+				}
 			}
-		}
-		// if we haven't found that user
-		if($matches == 0){
-			$this->groupid = "";
 		}
 	}
 
-	public function isLoaded(){
+
+
+	/**
+	 * Check whether the object contains data of a group
+	 *
+	 * @return bool true if data was loaded correctly. else false
+	 */
+	public function loaded(){
 		if($this->groupid == ''){
 			return false;
 		}
 		return true;
 	}
+	/**
+	 * Synonym for loaded().
+	 * For historic reasons.
+	 */
+	public function isLoaded(){
+		return loaded();
+	}
+
+
+
+	/**
+	 * Save changes permanently.
+	 * 
+	 * @return bool true on success.
+	 */
+	function save(){
+		if(!$this->loaded()) return false;
+
+		$this->dataset->save();
+		return true;
+	}
+
+
+
+	/**
+         * Provides the group's name
+	 *
+	 * @return name
+	 */
+	function getName(){
+		if(!$this->loaded()) return "";
+		return $this->groupnode->getAttribute("name");
+	}
+
+	/**
+         * Set the groups's name
+	 * The changes are not stored permanently. Call save() to
+	 * actually store changes.
+	 * @param $name the new value
+	 *
+	 * @return boolean true on success, false on failure
+	 */
+	function setName($name){
+		if(!$this->loaded()) return False;
+
+		$this->groupnode->setAttribute("name",$name);
+		return True;
+	}
+
+
+
+	/**
+         * Provides the group's description
+	 *
+	 * @return description
+	 */
+	function getDescription(){
+		if(!$this->loaded()) return "";
+		return $this->groupnode->getAttribute("description");
+	}
+
+	/**
+         * Set the groups's description
+	 * The changes are not stored permanently. Call save() to
+	 * actually store changes.
+	 * @param $description the new value
+	 *
+	 * @return boolean true on success, false on failure
+	 */
+	function setDescription($description){
+		if(!$this->loaded()) return False;
+
+		$this->groupnode->setAttribute("description",$description);
+		return True;
+	}
+
+
+
+	/**
+         * Provides the nr of seats
+	 *
+	 * @return seats
+	 */
+	function getSeats(){
+		if(!$this->loaded()) return "";
+		return $this->groupnode->getAttribute("seats");
+	}
+
+	/**
+         * Set the nr of seats
+	 * The changes are not stored permanently. Call save() to
+	 * actually store changes.
+	 * @param $seats the new value
+	 *
+	 * @return boolean true on success, false on failure
+	 */
+	function setSeats($seats){
+		if(!$this->loaded()) return False;
+
+		$this->groupnode->setAttribute("seats",$seats);
+		return True;
+	}
+
+
 
 	/**
 	 * Add a group with a newly generated id.
-	 * The values of the new group are in no way specified. You sould call saveChanges afterwards!
+	 *
+	 * @param $groupname name of the group
+	 * @param $description the description of the group
+	 * @param $seats no of seats
 	 *
 	 * @return the id of the newly generated group
-	*/	
-	public static function addGroup(){
+	 */	
+	public static function addGroup($groupname, $description, $seats){
 		//load the sheets dataset in write-mode
 		$groups = new Dataset('groups',true);
 
@@ -79,21 +199,28 @@ class Groups{
 		$newid = uniqid(true);
 		$nodeGroup = $groups->dom->createElement('group');		
 		$nodeGroup->setAttribute("id",$newid);
+		$nodeGroup->setAttribute("name",$groupname);
+		$nodeGroup->setAttribute("description",$description);
+		$nodeGroup->setAttribute("seats",$seats); // TODO: Validate field
 		$groups->dom->childNodes->item(0)->appendChild($nodeGroup);
 		$groups->save();
 		return $newid;
 	}
 
+
+
 	/**
-     * Try to get the value of a field.
+         * Try to get the value of a field.
 	 * 
 	 * @param string $fieldname The name of the field.
 	 *
 	 * @return mixed returns false if the required field is not present. It returns the value of the first node with that tagename else.
 	 *
 	 * @todo check whether loading a group was successfully before!
+	 * DEPRECATED
 	*/
 	function getField($fieldname){
+		Logger::log("Deprecated function getField in groups.php called.",Logger::LOGLEVEL_WARNING);
 		if($this->groupid != ""){
 			// Check for existence?
 			return $this->groupnode->getAttribute($fieldname);
@@ -103,6 +230,13 @@ class Groups{
 		}
 	}
 
+
+	
+	/**
+	 * get a JSON with information about the group
+	 *
+	 * @return an json-object
+	 */
 	public function getGroupJson(){
 		if($this->groupid != ""){
 			$returner['success']='yes';
@@ -168,6 +302,8 @@ class Groups{
 		}
 	}
 
+
+
 	/**
 	 * Returns a json object containing some information about each group
 	 *
@@ -186,15 +322,12 @@ class Groups{
 			$item["seats"] = $group->getAttribute("seats");
 			$item["students"] = Student::getStudentsInGroupCount($item["groupid"]);
 
-			/*$rolelist = array();
-			foreach($user->getElementsByTagName("role") as $role){
-				$rolelist[] = $role->nodeValue;
-			}
-			$item["rolelist"] = $rolelist;*/
 			$list[] = $item;
 		}
 		return json_encode($list);
 	}
+
+
 
 	/**
 	 * Returns an array containing some information about each group
@@ -214,12 +347,6 @@ class Groups{
 			$item["description"] = $group->getAttribute("description");
 			$item["seats"] = $group->getAttribute("seats");
 			$item["students"] = Student::getStudentsInGroupCount($item["groupid"]);
-
-			/*$rolelist = array();
-			foreach($user->getElementsByTagName("role") as $role){
-				$rolelist[] = $role->nodeValue;
-			}
-			$item["rolelist"] = $rolelist;*/
 
 			$list[] = $item;
 		}
