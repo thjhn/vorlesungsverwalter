@@ -363,7 +363,7 @@ class Sheet{
 			return -1;			
 		}
 		// Second, we check whether the format of $newscore is valid.
-		if(pre_match('/^[0-9]+(.[0-9]+)?$/', $newscore)==0){
+		if(preg_match('/^[0-9]+(.[0-9]+)?$/', $newscore)==0){
 			Logger::log("sheet.php, changeScore($sheet,$student,$newscore) was called. The format of newscore is considered invalid.",Logger::LOGLEVEL_VERBOSE);
 			return -1;
 		}
