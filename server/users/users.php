@@ -361,13 +361,17 @@ class Users{
 		// iterate over students
 		foreach($users->dom->getElementsByTagName("user") as $user){
 			// TODO Error handling
-			$item["username"] = $user->getElementsByTagName("username")->item(0)->nodeValue;
-			$item["enabled"] = $user->getElementsByTagName("enabled")->item(0)->nodeValue;
-			$item["realname"] = $user->getElementsByTagName("realname")->item(0)->nodeValue;
+			$item["username"] = $user->getAttribute("username");
+			$item["realname"] = $user->getAttribute("realname");
+			if($user->getAttribute("enabled")){
+				$item["enabled"] = "yes";
+			}else{
+				$item["enabled"] = "no";
+			}
 
 			$rolelist = array();
 			foreach($user->getElementsByTagName("role") as $role){
-				$rolelist[] = $role->nodeValue;
+				$rolelist[] = $role->getAttribute("rolename");
 			}
 			$item["rolelist"] = $rolelist;
 

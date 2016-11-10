@@ -593,11 +593,15 @@ switch($cmd){
 		}
 		break;
 
+	///////////////////////////////////////////////////////////////
+	// Get information on all users.
+	// 
+	// Roles required: admin
 	case 'LIST_USERS':
 		// Get a list of all users
-		Logger::log("Interface got 'LIST_USERS' with data $data.",Logger::LOGLEVEL_VERBOSE);
+		Logger::log("Interface got 'LIST_USERS'.",Logger::LOGLEVEL_VERBOSE);
 		if(!$AUTH->hasRole("admin")){
-			Logger::log("Interface got 'LIST_USERS' with data $data but the user was not allowed to call this 	command.",Logger::LOGLEVEL_ERROR);
+			Logger::log("Interface got 'LIST_USERS' but the user was not allowed to call this 	command.",Logger::LOGLEVEL_ERROR);
 			print("{\"success\":\"no\",\"errormsg\":\"Schwerwiegender interner Fehler.\"}");
 			break;
 		}
