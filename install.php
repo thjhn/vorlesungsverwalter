@@ -123,6 +123,7 @@
     $errors += checkFile("keys/vv3privatekey.pem",True);
     $errors += checkFile("keys/vv3publickey.pem",True);
     $errors += checkFile("log/main.log",True);
+    $errors += checkFile("log/",False);
     $errors += checkFile("keys/",False);
     if($errors == 0){
       print("<p>Tests passed.</p>");
@@ -230,6 +231,13 @@
         }else{
           fwrite($f,generateEmptyXML("exams"));
           print("<p>Exam file written.</p>");
+        }
+        $f = fopen("log/main.log","w");
+	if(!$f){
+          print("Was not able to write the log file. Check whether log-directory is writable!");
+        }else{
+          fwrite("");
+          print("<p>Log file written.</p>");
         }
         print("<p>Installtion finished. <a href=\"index.html\">Go to your VV</a>.</p>");
 
