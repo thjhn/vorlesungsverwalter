@@ -55,7 +55,7 @@ function scorestats_generateSheetStat(){
 				$.jqplot('scorestats_chartdiv', histlist, {
 					seriesDefaults:{
 						renderer:$.jqplot.BarRenderer,
-						rendererOptions: {shadowOffset: 0, barMargin:15},
+						rendererOptions: {shadowOffset: 0},
 						pointLabels: {show: true, formatString: '%d'}
 					},
 					animate: !$.jqplot.use_excanvas,
