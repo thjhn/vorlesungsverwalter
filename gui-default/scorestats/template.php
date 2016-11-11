@@ -21,21 +21,11 @@ function generate_scorestats_template(){
 	// Area for statistics
 	$tmpl = "<h1>Statistiken</h1>";
 
-	// on all sheets
-	$tmpl .= "<h2>Alle Bl&auml;tter</h2>";
-	$tmpl .= "<div id=\"scorestats_chartdiv_all\" style=\"height: 300px; width: 95%;\"></div>";
-
 	// on individual sheets
 	$tmpl .= "<h2>Einzelne Bl&auml;tter</h2>";
-	$tmpl .= "<form class='sheetSelectForm'><select size=\"1\" id=\"scorestats_sheet\" class='ui-corner-all'></select></form>";
-	$tmpl .= "<div id=\"scorestats_chartdiv_single\" style=\"height: 300px; width: 95%;\"></div>";
+	$tmpl .= "<form class='sheetSelectForm'><select size=\"1\" id=\"scorestats_sheet\" class='ui-corner-all'></select><select size=\"1\" id=\"scorestats_group\" class='ui-corner-all'></select></form>";
+	$tmpl .= "<div id=\"scorestats_chartdiv\" style=\"height: 300px; width: 95%;\"></div>";
 
-
-
-	// the dialog
-	$tmpl .= "<div id='scoresentered_dialog' title='Punkteeingabe'></div>";
-	// the dialog for editing socres
-	$tmpl .= "<div id='scoresentered_editdialog' title='&Auml;ndern von Punkten'></div>";
 	return $tmpl;
 }
 ?>
