@@ -42,25 +42,25 @@ $AUTH = new Authentication();
 $cmd = $_POST['cmd'];
 $data = $_POST['data'];
 switch($cmd){
-	case 'GET_TOOL':	// will later be moved to gui server
+	case 'GET_TOOL':
 	 	$TOOL = new Tool($_POST['data'],$AUTH);	
 		print($TOOL->getInfo());
 		break;
-	case 'GET_TOOL_SCRIPT':	// will later be moved to gui server
+	case 'GET_TOOL_SCRIPT':
 	 	$TOOL = new Tool($_POST['data'],$AUTH);
 		print($TOOL->getScript());
 		break;
-	case 'GET_LIST_OF_TOOLS':	// will later be moved to gui server
+	case 'GET_LIST_OF_TOOLS':
 		print(json_encode(Tool::getAvailableTools($AUTH)));
 		break;
-	case 'GET_CONTAINER':	// will later be moved to gui server
+	case 'GET_CONTAINER':
 		$filename = $_POST['data']."/template.tmpl";
 		$fp = fopen($filename,"r");
 		$container = fread($fp,filesize($filename));
 		fclose($fp);
 		print($container);		
 		break;
-	case 'GET_MENU':	// will later be moved to gui server
+	case 'GET_MENU':
 		$usersroles = $AUTH->getRolesArray();
 
 		// Load Config

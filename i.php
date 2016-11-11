@@ -402,7 +402,7 @@ switch($cmd){
 
 	///////////////////////////////////////////////////////////////
 	// Edit a specific group.
-	/// If groupid equals _new a new group is generated.
+	// If groupid equals _new a new group is generated.
 	// 
 	// data must be a JSON of the following format:
 	//   {"groupid":<groupid>, "name":<name>,
@@ -448,6 +448,34 @@ switch($cmd){
 		}
 		break;
 
+	
+	///////////////////////////////////////////////////////////////
+	// Get statistics on scores.
+	// 
+	// data must be a JSON of the following format:
+	//   {"sheet":<sheet>}
+	// where
+	//   <sheet> is the sheet we want the statistics for.
+	//	if == 0 we return the global statistic.
+	//
+	// Roles required: admin
+	case 'GET_SCORESTATS':
+		Logger::log("Interface got 'GET_SCORESTATS'.",Logger::LOGLEVEL_VERBOSE);
+		if(!$AUTH->hasRole("admin")){
+			Logger::log("Interface got 'GET_SCORESTATS' but the user was not allowed to call this command.",Logger::LOGLEVEL_ERROR);
+			print("{\"success\":\"no\",\"errormsg\":\"Schwerwiegender interner Fehler.\"}");
+			break;
+		}
+		$scoreStat = Sheet::getAllScoresStat($AUTH);
+		if($scoreStat === False){
+			Logger::log("Interface got 'GET_SCORESTATS' but getAllScoreStat() returned false.",Logger::LOGLEVEL_ERROR);
+			print("{\"success\":\"no\",\"errormsg\":\"Schwerwiegender interner Fehler.\"}");
+			break;
+		}
+
+		print("{\"success\":\"yes\",\"stat\":".json_encode($scoreStat[$data['sheet']])."}");
+		
+		break;
 
 
 

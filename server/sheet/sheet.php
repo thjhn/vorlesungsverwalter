@@ -128,6 +128,22 @@ class Sheet{
 
 	}
 
+
+	/**
+	 * Returns all scores of all students.
+	 *
+	 * It returns an array of <A> with indices the UIDs of the
+	 * score entries.
+	 * <A> is an object with fields
+	 *   'scores' which contains an array of type <B>
+	 *   'familyname'
+	 *   'givenname'
+	 * <B> is an array of the scores indexed by sheet-no.
+	 * 
+	 * @param Auth $auth the authentication object used for decryption.
+	 * 
+	 * @return see above
+	 */
 	public static function getAllScores($auth){
 		// here we need the student-stuff
 		include_once("server/student.php");
@@ -155,7 +171,6 @@ class Sheet{
 			// iterate over all included students
 			foreach($scorenode->getElementsByTagName("student") as $studnode){	
 				// add the scores
-//				$list[$studnode->getAttribute("uid")]['sheets'][$scorenode->getAttribute("sheet")] = $scorenode->getAttribute("score");
 				$curUid = $studnode->getAttribute("uid");
 				if(!array_key_exists($curUid,$list)){
 					$list[$curUid]['scores'] = $zeroScoreList;
@@ -171,7 +186,129 @@ class Sheet{
 			}
 		}
 		return $list;
+	}
 
+	/**
+	 * Returns a statistic of scores.
+	 *
+	 * ...
+	 * 
+	 * @param Auth $auth the authentication object used for decryption.
+	 * 
+	 * @return see above (not yet documented!)
+	 */
+	public static function getAllScoresStat($auth){
+		// here we need the student-stuff
+		include_once("server/student.php"); // not yet! later we want to include groups!
+
+		// First of all, get the number of sheets out of the configuration
+		$config = new Dataset('config',false);
+		foreach($config->dom->getElementsByTagName("sheets") as $nrofsheetsnode){
+			$nrofsheets = $nrofsheetsnode->textContent;
+		}
+
+		// Get a list of all groups available.
+		include_once("groups/groups.php");
+		$groups = Groups::getAllGroups();
+		$superGroup['groupid'] = "allgroups";
+		$groups[] = $superGroup;
+
+		// $list is the list we are going to return later
+		$list = array();
+
+		// append an emtpy item for each sheet
+		// the index 0 is for the sum over all sheets
+		$emptyItem = array();
+		$emptyItem['hist'] = array();
+		$emptyItem['max'] = 0;
+		$emptyItem['min'] = -1;
+		$emptyItem['sum'] = 0;
+		$emptyItem['count'] = 0;
+		$zeroScoreList = array();
+		for($i=0; $i<=$nrofsheets; $i++){
+			$list[$i] = [];
+			for($j=0; $j<count($groups); $j++){
+				$list[$i][$groups[$j]['groupid']] = $emptyItem;
+			}
+		}
+
+
+		//load the sheets dataset in read-mode
+		$sheets = new Dataset('sheets',false);
+
+		// iterate over all score-nodes.
+		foreach($sheets->dom->getElementsByTagName("score") as $scorenode){
+			// get the number of the current sheet
+			$curSheet = $scorenode->getAttribute("sheet");
+			// try to decode the score
+			$curScore = Crypto::decrypt_in_team($scorenode->getAttribute("score"),$auth);
+			if($score_dec === false){ return false; }
+			// adjust maxima and minima if necessary:
+			if($list[$curSheet]['allgroups']['max'] < $curScore){
+				$list[$curSheet]['allgroups']['max'] = $curScore;
+				if($list[0]['allgroups']['max'] < $curScore){
+					$list[0]['allgroups']['max'] = $curScore;
+				}
+			}
+			if($list[$curSheet]['allgroups']['min'] < 0 || $list[$curSheet]['allgroups']['min'] > $curScore){
+				$list[$curSheet]['allgroups']['min'] = $curScore;
+				if($list[0]['allgroups']['min'] < 0 || $list[0]['allgroups']['min'] > $curScore){
+					$list[0]['allgroups']['min'] = $curScore;
+				}
+			}
+
+			// we already have the scores but we want to take
+			// multiple students into account accordingly.
+			// iterate over all included students
+			foreach($scorenode->getElementsByTagName("student") as $studnode){	
+				// add the scores, first to the allgroups field.
+				$list[$curSheet]['allgroups']['sum'] += $curScore;
+				$list[0]['allgroups']['sum'] += $curScore;
+				$list[$curSheet]['allgroups']['count']++;
+				$list[0]['allgroups']['count']++;
+				if(array_key_exists($curScore,$list[$curSheet]['allgroups']['hist'])){
+					$list[$curSheet]['allgroups']['hist'][$curScore]++;
+				}else{
+					$list[$curSheet]['allgroups']['hist'][$curScore]=1;
+				}
+				if(array_key_exists($curScore,$list[0]['allgroups']['hist'])){
+					$list[0]['allgroups']['hist'][$curScore]++;
+				}else{
+					$list[0]['allgroups']['hist'][$curScore]=1;
+				}
+				// now, we see in what group the student is in
+				$curStud = new Student($studnode->getAttribute("uid"), false);
+				if(!$curStud->loaded()){
+					Logger::log("We found scores for a student with id ".$studnode->getAttribute("uid")." who does not exist.",LOGGER_ERROR);
+				}else{
+					$curGroup = $curStud->getGroup();
+					if($curGroup === false){
+						Logger::log("Could not get group of student ".$studnode->getAttribute("uid").".",LOGGER_ERROR);
+					}else{
+						if($list[$curSheet][$curGroup]['max'] < $curScore){
+							$list[$curSheet][$curGroup]['max'] = $curScore;
+						}
+						if($list[$curSheet][$curGroup]['min'] < 0 || $list[$curSheet][$curGroup]['min'] > $curScore){
+							$list[$curSheet]['allgroups']['min'] = $curScore;
+						}
+						$list[$curSheet][$curGroup]['sum'] += $curScore;
+						$list[$curSheet][$curGroup]['count']++;
+						if(array_key_exists($curScore,$list[$curSheet][$curGroup]['hist'])){
+							$list[$curSheet][$curGroup]['hist'][$curScore]++;
+						}else{
+							$list[$curSheet][$curGroup]['hist'][$curScore]=1;
+						}
+						if(array_key_exists($curScore,$list[0][$curGroup]['hist'])){
+							$list[0][$curGroup]['hist'][$curScore]++;
+						}else{
+							$list[0][$curGroup]['hist'][$curScore]=1;
+						}
+
+					}
+				}
+			}
+		}
+		return $list;
 	}
 
 	public static function getScores($corrector,$auth){
@@ -267,8 +404,7 @@ class Sheet{
 	}
 
 	/**
-     * Stores a score.
-	 * 
+	 * Stores a score.
 	 * 
 	 * @param Auth $auth The user's authentication object
 	 * @param string $sheet The no. of the sheet.
@@ -345,7 +481,7 @@ class Sheet{
  	}
 
 	/**
-     * Changes a single score identified by $sheet and $student.
+	 * Changes a single score identified by $sheet and $student.
 	 * 
 	 * @param string $sheet no. of sheet
 	 * @param string $student uid of student
@@ -402,7 +538,7 @@ class Sheet{
 	}
 
 	/**
-     * Changes scores.
+	 * Changes scores.
 	 *
 	 * Calls the function changeScore iteratively.
 	 * 

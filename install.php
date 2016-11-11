@@ -61,6 +61,7 @@
     $out .= "			<module key=\"enterscores\"/>\n";
     $out .= "			<module key=\"scoresentered\"/>\n";
     $out .= "			<module key=\"scoreresults\"/>\n";
+    $out .= "			<module key=\"scorestats\"/>\n";
     $out .= "		</box>\n";
     $out .= "		<box title=\"Konfiguration\">\n";
     $out .= "			<module key=\"settings\"/>\n";
