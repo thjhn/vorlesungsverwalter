@@ -74,6 +74,25 @@ class Student{
 		return ($this->uid != "");
 	}
 
+	/**
+	 * Alias for exists();
+	 */
+	function loaded(){
+		return $this->exists();
+	}
+
+	/**
+	 * Get the student's group.
+	 * 
+	 * @return the group
+	*/
+	function getGroup(){
+		if(!$this->loaded()){
+			Logger::log("student.php, getGroup was called but student was not loaded properly.",Logger::LOGLEVEL_ERROR);
+			return False;
+		}
+		return $this->studentnode->getAttribute("ingroup");
+	}
 
 
 	/**
