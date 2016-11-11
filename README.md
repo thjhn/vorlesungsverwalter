@@ -20,6 +20,8 @@ Installation
 ------------
 Run the install.php file in your browser and make sure you resolve the errors shown (if any). Then you should be able to provide some information about your lecture and hit submit.
 
+Note that the server communicates with its clients in plain text. Therefore the webserver should only be accessed using HTTPS.
+
 First Steps
 -----------
 When you have set-up the program you may log in.
