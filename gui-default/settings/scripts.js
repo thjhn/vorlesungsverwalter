@@ -50,8 +50,6 @@ $("#settings_chpasswd_dialog").dialog({
 						}
 					}
 				}).done(function(data){
-					console.log(data);
-
 					if(data.success == 'yes'){
 						showSuccessMsg("Ihr Passwort wurde ge&auml;ndert.");
 						$("#settings_chpasswd_dialog").dialog("close");

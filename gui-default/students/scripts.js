@@ -151,7 +151,6 @@ $("#students_btn_find").on('click',function(e){
 
 			}).done(function(data){
 				$("#mod_students_edit_dialog select[name=ingroup]").empty();
-console.log(data.length);
 				for(var i = 0; i< data.length; i++){
 
 					// check whether the currenct group is the user's one

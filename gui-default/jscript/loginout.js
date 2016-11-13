@@ -151,7 +151,6 @@ function updateMenu(){
 								$("#panel").append("<div class='container'>"+jQuery.base64('decode',tool.template)+"</div>");
 
 								// load the tool's scriptfile (and execute those)
-								console.log("Loading script for key="+key,this);
 								$.ajax({		
 									url:"gui-default/gi.php",
 									dataType:"script",

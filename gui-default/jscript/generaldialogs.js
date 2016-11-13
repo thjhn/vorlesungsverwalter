@@ -19,7 +19,6 @@
 
 $(document).ajaxError(function(event, jqxhr, ajaxOptions, errorThrown) {
 	showErrorMsg("Ihre Anfrage konnte nicht an den Server &uuml;bermittelt werden. Versuchen Sie es sp&auml;ter erneut. Sollte das Problem weiterhin bestehen, so kontaktieren Sie bitte den Administrator.");
-    console.log("AJAX request failed:"+ajaxOptions.url+" "+ajaxOptions.data);
 });
 
 jQuery().ready(function(){

@@ -41,7 +41,6 @@ $("#groups_edit_dialog").dialog({
 					data:dataobject
 				}
 			}).done(function(data){
-				console.log(data);
 				$("#groups_changes_dialog").empty();
 				if(data.success == 'yes'){
 					$("#groups_changes_dialog").append("<div>Die &Auml;nderungen wurden erfolgreich gespeichert.</div>");

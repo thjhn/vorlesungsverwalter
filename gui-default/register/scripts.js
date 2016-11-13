@@ -171,7 +171,7 @@ $.ajax({
 					skipClosing = true;
 				}
 			}
-console.log(skipClosing);
+
 			if(!skipClosing){
 				$(".container").empty();
 				$(".container").append("<div class='errorMsgInPanel'><p><b>Anmeldung gesperrt.</b></p><p>Derzeit ist die Anmeldung zum &Uuml;bungsbetrieb <em>nicht</em> freigeschalten. Wenden Sie sich bitte an das Vorlesungsteam, wenn Sie dies f&uuml;r einen Fehler halten oder Sie Fragen dazu haben.</p></div>");

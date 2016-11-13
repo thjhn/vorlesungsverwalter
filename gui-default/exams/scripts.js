@@ -38,7 +38,6 @@ $("#exams_edit_dialog").dialog({
 			});
 
 			var dataobject = {exam:$("#exams_edit_dialog input[name=examid]").attr("value"), changes:editarray};
-			console.log(dataobject);
 			$.ajax({
 				url:"i.php",
 				type:"POST",
@@ -144,7 +143,6 @@ function refreshExamsTable(){
 					data:cur_examid
 				}
 			}).done(function(data){
-				console.log(data);
 				if(data.success == 'yes'){
 					$("#exams_edit_dialog").find("input[name=examid]").attr("value",data.exam);
 					$("#exams_edit_dialog").find("input[name=name]").attr("value",data.name);

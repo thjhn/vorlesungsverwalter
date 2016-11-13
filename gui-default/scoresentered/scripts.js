@@ -114,8 +114,7 @@ function updateScoreTable(){
 			});
 			
 		}else{
-			// an error occured
-			console.log("ERROR: "+data.errormsg);
+			// error msg?
 		}
 	});
 }

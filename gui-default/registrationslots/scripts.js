@@ -67,7 +67,6 @@ $("#registrationslots_edit_dialog").dialog({
 			var end_enc = end.substr(6,4)+"-"+end.substr(3,2)+"-"+end.substr(0,2)+"T"+$("#registrationslots_edit_dialog_endtime").attr('value')+":00";
 
 			var dataobject = {slotid:$("#registrationslots_edit_dialog_id").attr("value"), start:start_enc, end:end_enc};
-console.log(dataobject);
 
 			$.ajax({
 				url:"i.php",
