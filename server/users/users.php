@@ -29,7 +29,6 @@
  */
 class Users{
 	var $username,$editable,$usernode;
-	const ALLOWED_ROLES = ['dev','admin','corrector'];
 
 	/**
          * The constructor loads the users using their username.
