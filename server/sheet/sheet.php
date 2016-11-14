@@ -427,7 +427,7 @@ class Sheet{
 		}
 
 		// Second, we check whether the format of $score is valid.
-		if(preg_match('/^[0-9]+(.[0-9]+)?$/', $score)==0){
+		if(preg_match('/^[0-9]+(\.[0-9]+)?$/', $score)==0){
 			Logger::log("sheet.php, setScore: User $auth requested to setScore with score $score. The format is considered invalid.",Logger::LOGLEVEL_VERBOSE);
 			return "{\"success\":\"no\",\"errormsg\":\"Das Format von 'Punkte' ist nicht valide.\"}";
 		}

@@ -90,6 +90,15 @@ class Dataset{
 		fclose($this->lock_file);
 	}
 
+	/**
+	 * Check whether loading the Dataset was successful.
+	 *
+	 * @return bool loaded state
+	 */
+	function isLoaded(){
+		return $this->loaded;
+	}
+
 
 	/**
          * Find all $nodename nodes in the dom variable of the dataset that have

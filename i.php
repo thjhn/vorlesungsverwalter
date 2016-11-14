@@ -104,36 +104,44 @@ switch($cmd){
 	// and lecturer.
 	//
 	// Roles required: none
-	// TODO: Error handling. I.e. the dataset could not be loaded.
 	case 'GET_BASIC_INFO':
 		$conf = new Dataset("config",false);
-		$lecture = $conf->dom->getElementsByTagName("lecture")->item(0)->nodeValue;
-		$term = $conf->dom->getElementsByTagName("term")->item(0)->nodeValue;
-		$lecturer = $conf->dom->getElementsByTagName("lecturer")->item(0)->nodeValue;
-		echo "{\"success\":\"yes\",\"lecture\":\"$lecture\", \"term\":\"$term\", \"lecturer\":\"$lecturer\"}";
+		if(!$conf->isLoaded()){
+			Logger::log("Interface could not handle 'GET_BASIC_INFO': Config not available.",Logger::LOGLEVEL_ERROR);
+			echo "{\"success\":\"no\",\"errmsg\":\"Could not load server configuration.\"}";
+		}else{
+			$lecture = $conf->dom->getElementsByTagName("lecture")->item(0)->nodeValue;
+			$term = $conf->dom->getElementsByTagName("term")->item(0)->nodeValue;
+			$lecturer = $conf->dom->getElementsByTagName("lecturer")->item(0)->nodeValue;
+			echo "{\"success\":\"yes\",\"lecture\":\"$lecture\", \"term\":\"$term\", \"lecturer\":\"$lecturer\"}";
+		}
 		break;
 
 
 	///////////////////////////////////////////////////////////////
-	// Get a list of all slots.
+	// Get a list of all slots for registration.
 	// Returns a JSON object containing an array of all slots.
 	// Each item contains the fields id, start and end.
 	//
 	// Roles required: none
-	// TODO: Error handling. I.e. the dataset could not be loaded.
 	case 'LIST_REGISTRATIONSLOTS':
 		// get a list of all slots
 		$conf = new Dataset("config",false);
-		$ret = array();
-		$registrationslots = $conf->dom->getElementsByTagName("registrationslot");
-		foreach($registrationslots as $slot){
-			$slotitem = array();
-			$slotitem['id'] = $slot->getAttribute("id");
-			$slotitem['start'] = $slot->getAttribute("start");
-			$slotitem['end'] = $slot->getAttribute("end");
-			$ret[] = $slotitem;
+		if(!$conf->isLoaded()){
+			Logger::log("Interface could not handle 'LIST_REGISTRATIONSLOT': Config not available.",Logger::LOGLEVEL_ERROR);
+			echo "{\"success\":\"no\",\"errmsg\":\"Could not load server configuration.\"}";
+		}else{
+			$ret = array();
+			$registrationslots = $conf->dom->getElementsByTagName("registrationslot");
+			foreach($registrationslots as $slot){
+				$slotitem = array();
+				$slotitem['id'] = $slot->getAttribute("id");
+				$slotitem['start'] = $slot->getAttribute("start");
+				$slotitem['end'] = $slot->getAttribute("end");
+				$ret[] = $slotitem;
+			}
+			print(json_encode(array('success'=>'yes','slots'=>$ret)));
 		}
-		print(json_encode(array('success'=>'yes','slots'=>$ret)));
 		break;
 
 
@@ -143,11 +151,10 @@ switch($cmd){
 	// is set to data->start, its endtime to data->end.
 	// 
 	// Roles required: admin
-	// TODO: Error handling. I.e. the dataset could not be loaded.
 	case 'EDIT_REGISTRATIONSLOT':
 		Logger::log("Interface got 'EDIT_REGISTRATIONSLOT'.",Logger::LOGLEVEL_VERBOSE);
 		if(!$AUTH->hasRole("admin")){
-			Logger::log("Interface got 'EDIT_REGISTRATIONSLOT' but the user was not allowed to call this 	command.",Logger::LOGLEVEL_ERROR);
+			Logger::log("Interface got 'EDIT_REGISTRATIONSLOT' but the user was not allowed to call this command.",Logger::LOGLEVEL_ERROR);
 			print("{\"success\":\"no\",\"errormsg\":\"Schwerwiegender interner Fehler.\"}");
 			break;
 		}
@@ -164,6 +171,11 @@ switch($cmd){
 		}
 
 		$conf = new Dataset("config",true);
+		if(!$conf->isLoaded()){
+			Logger::log("Interface could not handle 'EDIT_REGISTRATIONSLOT': Config not available.",Logger::LOGLEVEL_ERROR);
+			echo "{\"success\":\"no\",\"errmsg\":\"Could not load server configuration.\"}";
+			break;
+		}
 
 		if($data['slotid'] == "_new"){
 			$newNode = $conf->dom->createElement('registrationslot');
@@ -220,9 +232,9 @@ switch($cmd){
 	// 
 	// Roles required: corrector, admin
 	case 'GET_EXAM':
-		Logger::log("Interface got 'GET_EXAM' with data $data.",Logger::LOGLEVEL_VERBOSE);
+		Logger::log("Interface got 'GET_EXAM'.",Logger::LOGLEVEL_VERBOSE);
 		if(!$AUTH->hasRole("corrector") && !$AUTH->hasRole("admin")){
-			Logger::log("Interface got 'GET_EXAM' but the user was not allowed to call this 	command.",Logger::LOGLEVEL_ERROR);
+			Logger::log("Interface got 'GET_EXAM' but the user was not allowed to call this command.",Logger::LOGLEVEL_ERROR);
 			print("{\"success\":\"no\",\"errormsg\":\"Schwerwiegender interner Fehler.\"}");
 			break;
 		}
@@ -280,13 +292,15 @@ switch($cmd){
 	// Roles required: none
 	// Note: a user with role admin is allowed to perform this
 	// request even if there is no open registration slot.
-	// TODO: Error handling. I.e. the dataset could not be loaded.
 	case 'REGISTER_NEW_STUDENT':
+		Logger::log("Interface got 'REGISTER_NEW_STUDENT'.",Logger::LOGLEVEL_VERBOSE);
 		// Check whether a registrations is currently possible.
 		$conf = new Dataset("config",false);
-		$lecture = $conf->dom->getElementsByTagName("lecture")->item(0)->nodeValue;
-		$term = $conf->dom->getElementsByTagName("term")->item(0)->nodeValue;
-		$lecturer = $conf->dom->getElementsByTagName("lecturer")->item(0)->nodeValue;
+		if(!$conf->isLoaded()){
+			Logger::log("Interface could not handle 'REGISTER_NEW_STUDENT': Config not available.",Logger::LOGLEVEL_ERROR);
+			echo "{\"success\":\"no\",\"errmsg\":\"Could not load server configuration.\"}";
+			break;
+		}
 		$registrationslots = $conf->dom->getElementsByTagName("registrationslot");
 		$matches = 0;
 		foreach($registrationslots as $slot){
@@ -304,12 +318,12 @@ switch($cmd){
 		}
 		if($matches == 0){
 			// registration is currently not allowed.
-			Logger::log("interface.php of tool register recieved a REGISTER command from IP ".$_SERVER['REMOTE_ADDR']." while registering was not allowed.",Logger::LOGLEVEL_WARNING);
+			Logger::log("interface.php of tool register recieved a REGISTER command from IP ".$_SERVER['REMOTE_ADDR']." while registration was not allowed.",Logger::LOGLEVEL_WARNING);
 			print("{\"success\":\"no\",\"errormsg\":\"Die Anmeldung ist gerade nicht freigeschalten.\"}");
 			break;
 		}
 
-		// registration is currently allowed				
+		// registration is currently allowed
 		$data = json_decode($data);
 		$studReturn = Student::addStudent($data->familyname,$data->givenname,$data->matrnr,$data->term,$data->email,$data->course,$data->ingroup);
 		// if $studReturn is an array, an error occured:
@@ -334,13 +348,13 @@ switch($cmd){
 	// Get a list of the family- and givennames of all students.
 	// 
 	// Roles required: corrector, admin
-	// TODO: Send Permission error.
 	case 'LIST_ALL_STUDENTS_FG':
+		Logger::log("Interface got 'LIST_ALL_STUDENTS_FG'.",Logger::LOGLEVEL_VERBOSE);
 		if($AUTH->hasRole("corrector") || $AUTH->hasRole("admin")){
-			Logger::log("Interface got 'LIST_ALL_STUDENTS_FG'.",Logger::LOGLEVEL_VERBOSE);
 			print(Student::findStudentsJson("FG",$data,$AUTH));
 		}else{
-			// TODO: Send Permission error.
+			Logger::log("Interface got 'LIST_ALL_STUDENTS_FG' but the user was not allowed to call this command.",Logger::LOGLEVEL_ERROR);
+			print("{\"success\":\"no\",\"errormsg\":\"Zugriff verweigert.\"}");
 		}
 		break;
 
@@ -350,13 +364,13 @@ switch($cmd){
 	// students.
 	// 
 	// Roles required: admin
-	// TODO: Send Permission error.
 	case 'LIST_ALL_STUDENTS_FGM':
+		Logger::log("Interface got 'LIST_ALL_STUDENTS_FGM'.",Logger::LOGLEVEL_VERBOSE);
 		if($AUTH->hasRole("admin")){
-			Logger::log("Interface got 'LIST_ALL_STUDENTS_FGM'.",Logger::LOGLEVEL_VERBOSE);
 			print(Student::findStudentsJson("FGM",$data,$AUTH));
 		}else{
 			Logger::log("Interface got 'LIST_ALL_STUDENTS_FGM'. But user was not allowed to call it.",Logger::LOGLEVEL_WARNING);
+			print("{\"success\":\"no\",\"errormsg\":\"Zugriff verweigert.\"}");
 		}
 		break;
 
@@ -368,12 +382,12 @@ switch($cmd){
 	// Roles required: corrector
 	case 'ENTER_SCORE':
 		// user wants to enter some scores
-		Logger::log("Interface got 'ENTER_SCORE' with data $data.",Logger::LOGLEVEL_VERBOSE);
+		Logger::log("Interface got 'ENTER_SCORE'.",Logger::LOGLEVEL_VERBOSE);
 		if($AUTH->hasRole("corrector")){
 			$theData = json_decode($data,true);
 			$username = $AUTH->getUsername();
 			if($username === FALSE){
-				Logger::log("interface.php of tool enterscores could not get username while handling ENTER_SCORE with data $data.",Logger::LOGLEVEL_ERROR);
+				Logger::log("interface.php of tool enterscores could not get username while handling ENTER_SCORE.",Logger::LOGLEVEL_ERROR);
 				print("{\"success\":\"no\",\"errormsg\":\"Schwerwiegender interner Fehler. Keine Eintragungen wurden gespeichert!\"}");
 				break;
 			}else{
@@ -381,7 +395,7 @@ switch($cmd){
 				break;
 			}
 		}else{
-			Logger::log("Interface got 'ENTER_SCORE' with data $data but the user was not allowed to call this command.",Logger::LOGLEVEL_ERROR);
+			Logger::log("Interface got 'ENTER_SCORE' but the user was not allowed to call this command.",Logger::LOGLEVEL_ERROR);
 			print("{\"success\":\"no\",\"errormsg\":\"Schwerwiegender interner Fehler. Keine Eintragungen wurden gespeichert!\"}");
 		}
 		break;
@@ -392,7 +406,6 @@ switch($cmd){
 	// $data contains the id of the group in question.
 	// 
 	// Roles required: none
-	// TODO: Use JSON input!
 	case 'GET_GROUP_JSON':
 		Logger::log("Interface got 'GET_GROUP_JSON'.",Logger::LOGLEVEL_VERBOSE);
 		$curGroup = new Groups($data);
@@ -478,9 +491,12 @@ switch($cmd){
 		break;
 
 
-
+	///////////////////////////////////////////////////////////////
+	// Get a JSON of the scores of all students.
+	//
+	// Roles required: admin
 	case 'LIST_ALL_STUDENTS_SCORES':
-		Logger::log("Interface got 'LIST_ALL_STUDENTS_SCORES' with data $data.",Logger::LOGLEVEL_VERBOSE);
+		Logger::log("Interface got 'LIST_ALL_STUDENTS_SCORES'.",Logger::LOGLEVEL_VERBOSE);
 		if($AUTH->hasRole("admin")){
 			print(json_encode(Sheet::getAllScores($AUTH)));
 		}else{
@@ -489,16 +505,22 @@ switch($cmd){
 		}
 		break;
 
+
+	///////////////////////////////////////////////////////////////
+	// Get a JSON of the scores of all students of corrector
+	// the currently logged in.
+	//
+	// Roles required: corrector
 	case 'LIST_ALL_CORRECTORS_SCORES':
-		Logger::log("Interface got 'LIST_ALL_CORRECTORS_SCORES' with data $data.",Logger::LOGLEVEL_VERBOSE);
+		Logger::log("Interface got 'LIST_ALL_CORRECTORS_SCORES'.",Logger::LOGLEVEL_VERBOSE);
 		if(!$AUTH->hasRole("corrector")){
-			Logger::log("Interface got 'LIST_ALL_CORRECTORS_SCORES' with data $data but the user was not allowed to call this 	command.",Logger::LOGLEVEL_ERROR);
+			Logger::log("Interface got 'LIST_ALL_CORRECTORS_SCORES' but the user was not allowed to call this command.",Logger::LOGLEVEL_ERROR);
 			print("{\"success\":\"no\",\"errormsg\":\"Schwerwiegender interner Fehler.\"}");
 			break;
 		}
 		$username = $AUTH->getUsername($AUTH);
 		if($username === FALSE){
-			Logger::log("i.php could not get username while handling LIST_ALL_CORRECTORS_SCORES with data $data.",Logger::LOGLEVEL_ERROR);
+			Logger::log("i.php could not get username while handling LIST_ALL_CORRECTORS_SCORES.",Logger::LOGLEVEL_ERROR);
 			print("{\"success\":\"no\",\"errormsg\":\"Schwerwiegender interner Fehler.\"}");
 			break;
 		}else{
@@ -511,11 +533,17 @@ switch($cmd){
 		}
 
 
+
+	///////////////////////////////////////////////////////////////
+	// Edit a single score.
+	// 
+	//
+	// Roles required: corrector
 	case 'EDIT_SCORE':
 		// user wants to edit some scores
-		Logger::log("Interface got 'EDIT_SCORE' with data $data.",Logger::LOGLEVEL_VERBOSE);
+		Logger::log("Interface got 'EDIT_SCORE'.",Logger::LOGLEVEL_VERBOSE);
 		if(!$AUTH->hasRole("corrector")){
-			Logger::log("Interface got 'EDIT_SCORE' with data $data but the user was not allowed to call this 	command.",Logger::LOGLEVEL_ERROR);
+			Logger::log("Interface got 'EDIT_SCORE' but the user was not allowed to call this command.",Logger::LOGLEVEL_ERROR);
 			print("{\"success\":\"no\",\"errormsg\":\"Schwerwiegender interner Fehler.\"}");
 			break;
 		}
@@ -529,11 +557,10 @@ switch($cmd){
 		if($corrector == $username){
 			// We check whether the format of $score is valid.
 			// Actually, this is also done within the updateScore function but we want to explicitely know whether this error occurred!
-			// @todo replace ereg!
-			/*if(!ereg('^[0-9]+(.[0-9]+)?$', $data['newscore'])){
+			if( preg_match('/^[0-9]+(\.[0-9]+)?$/', $data['newscore'])==0 ){
 				print("{\"success\":\"no\",\"errormsg\":\"Die Punkteangabe hat nicht das korrekte Format.\"}");
 				break;
-			}*/
+			}
 			if($sheet->updateScore($data['newscore'],$AUTH)){
 				print("{\"success\":\"yes\"}");
 			}else{
@@ -547,11 +574,16 @@ switch($cmd){
 
 		break;
 
+
+	///////////////////////////////////////////////////////////////
+	// Get a list of all students with some infos about them.
+	// 
+	//
+	// Roles required: admin
 	case 'LIST_OF_ALL_STUDENTS_WITH_INFO':
-		// user wants a list of all students and some information about them
-		Logger::log("Interface got 'LIST_OF_ALL_STUDENTS_WITH_INFO' with data $data.",Logger::LOGLEVEL_VERBOSE);
+		Logger::log("Interface got 'LIST_OF_ALL_STUDENTS_WITH_INFO'.",Logger::LOGLEVEL_VERBOSE);
 		if(!$AUTH->hasRole("admin")){
-			Logger::log("Interface got 'LIST_OF_ALL_STUDENTS_WITH_INFO' with data $data but the user was not allowed to call this 	command.",Logger::LOGLEVEL_ERROR);
+			Logger::log("Interface got 'LIST_OF_ALL_STUDENTS_WITH_INFO' but the user was not allowed to call this command.",Logger::LOGLEVEL_ERROR);
 			print("{\"success\":\"no\",\"errormsg\":\"Schwerwiegender interner Fehler.\"}");
 			break;
 		}
@@ -559,6 +591,13 @@ switch($cmd){
 		break;
 
 
+
+	///////////////////////////////////////////////////////////////
+	// Get a json with info about a specific student.
+	// The ID is given as data.
+	// 
+	//
+	// Roles required: admin
 	case 'GET_STUDENT':
 		// user wants information about a specific student
 		Logger::log("Interface got 'GET_STUDENT' with data $data.",Logger::LOGLEVEL_VERBOSE);
@@ -572,6 +611,13 @@ switch($cmd){
 		break;
 
 
+	////////////////////////////////////////////////////
+///////////
+	// Get a json with the scores of a specific student.
+	// The ID is given as data.
+	// 
+	//
+	// Roles required: admin
 	case 'GET_A_STUDENTS_SCORES':
 		// Get the scores of a specific student.
 		Logger::log("Interface got 'GET_A_STUDENTS_SCORES' with data $data.",Logger::LOGLEVEL_VERBOSE);
@@ -583,6 +629,7 @@ switch($cmd){
 		// returns the scores of a single student
 		print(Sheet::getScoreByStudent($data,$AUTH));
 		break;
+
 
 
 	///////////////////////////////////////////////////////////////
@@ -644,6 +691,7 @@ switch($cmd){
 		}
 		break;
 
+
 	///////////////////////////////////////////////////////////////
 	// Get information on all users.
 	// 
@@ -652,18 +700,23 @@ switch($cmd){
 		// Get a list of all users
 		Logger::log("Interface got 'LIST_USERS'.",Logger::LOGLEVEL_VERBOSE);
 		if(!$AUTH->hasRole("admin")){
-			Logger::log("Interface got 'LIST_USERS' but the user was not allowed to call this 	command.",Logger::LOGLEVEL_ERROR);
+			Logger::log("Interface got 'LIST_USERS' but the user was not allowed to call this command.",Logger::LOGLEVEL_ERROR);
 			print("{\"success\":\"no\",\"errormsg\":\"Schwerwiegender interner Fehler.\"}");
 			break;
 		}
 		print(Users::getAllUsersJson());
 		break;
 
+	///////////////////////////////////////////////////////////////
+	// Get information on a single users.
+	// data contains the id.
+	// 
+	// Roles required: admin
 	case 'GET_USER':
 		// Get data of a specific student
 		Logger::log("Interface got 'GET_USER' with data $data.",Logger::LOGLEVEL_VERBOSE);
 		if(!$AUTH->hasRole("admin")){
-			Logger::log("Interface got 'GET_USER' with data $data but the user was not allowed to call this 	command.",Logger::LOGLEVEL_ERROR);
+			Logger::log("Interface got 'GET_USER' with data $data but the user was not allowed to call this command.",Logger::LOGLEVEL_ERROR);
 			print("{\"success\":\"no\",\"errormsg\":\"Schwerwiegender interner Fehler.\"}");
 			break;
 		}
@@ -827,7 +880,6 @@ switch($cmd){
 	default:
 		echo "UNKNOWN";
 		Logger::log("i.php recieved an unknown command, namely: $cmd",Logger::LOGLEVEL_WARNING);
-		// TODO: ANY ANSWER?	
 }
 
 
