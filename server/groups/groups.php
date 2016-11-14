@@ -104,7 +104,7 @@ class Groups{
 	/**
          * Provides the group's name
 	 *
-	 * @return name
+	 * @return name, or empty string on failure
 	 */
 	function getName(){
 		if(!$this->loaded()) return "";
@@ -131,7 +131,7 @@ class Groups{
 	/**
          * Provides the group's description
 	 *
-	 * @return description
+	 * @return description or empty string on failure
 	 */
 	function getDescription(){
 		if(!$this->loaded()) return "";
@@ -158,7 +158,7 @@ class Groups{
 	/**
          * Provides the nr of seats
 	 *
-	 * @return seats
+	 * @return mixed number of seats or empty string on failure
 	 */
 	function getSeats(){
 		if(!$this->loaded()) return "";
@@ -216,8 +216,7 @@ class Groups{
 	 *
 	 * @return mixed returns false if the required field is not present. It returns the value of the first node with that tagename else.
 	 *
-	 * @todo check whether loading a group was successfully before!
-	 * DEPRECATED
+	 * DEPRECATED, will be removed!
 	*/
 	function getField($fieldname){
 		Logger::log("Deprecated function getField in groups.php called.",Logger::LOGLEVEL_WARNING);
@@ -238,7 +237,7 @@ class Groups{
 	 * @return an json-object
 	 */
 	public function getGroupJson(){
-		if($this->groupid != ""){
+		if($this->loaded()){
 			$returner['success']='yes';
 			$returner['groupid']=$this->groupid;
 			$returner['name']=$this->getField("name");			
@@ -252,8 +251,18 @@ class Groups{
 	}
 
 
+	/**
+	 * get a JSON with information about the group
+	 *
+	 * @return an json-object
+	 */
 	public function getStudentsJson(){
-		return Student::getStudentsInGroup($this->groupid);
+		if($this->loaded()){
+			return Student::getStudentsInGroup($this->groupid);
+		}else{
+			$returner['success']='no';
+			$returner['errormsg']="The given group is illegal.";
+		}
 	}
 
 	/**
@@ -262,8 +271,10 @@ class Groups{
 	 * @param array $changes A list of changes to be made. Each item is an associative array with fields 'field' and 'newvalue'
 	 *
 	 * @return boolean Was saving changes successful?
+	 * Deprecated.
 	 */
 	function saveChanges($changes){
+		Logger::log("Deprecated function saveChanges in groups.php called.",Logger::LOGLEVEL_WARNING);
 		if($this->editable){
 			if($this->groupid != ""){
 				for($i=0;$i<count($changes);$i++){
@@ -283,23 +294,25 @@ class Groups{
 		}
 	}
 
+
+	/**
+	 * Gives the number of free seats in a group.
+	 *
+	 * @return int nr of free seats. 0 on failure. -1 if the nubmer is infinity.
+	 */
 	public function freeSeats(){
-		if($this->groupid != ""){
-			$seats = $this->getField("seats");
-
-			if($seats == "inf"){
-				return -1;
-			}
-
-			$seats = $seats - Student::getStudentsInGroupCount($this->groupid);
-			if($seats < 0){
-				return 0;
-			}
-
-			return $seats;
-		}else{
-			return 0;
+		if(!$this->loaded()) return 0;
+		$seats = $this->getField("seats");
+		if($seats == "inf"){
+			return -1;
 		}
+
+		// actually compute the number
+		$seats = $seats - Student::getStudentsInGroupCount($this->groupid);
+		// if the number is alread  negative return 0.
+		if($seats < 0)	return 0;
+
+		return $seats;
 	}
 
 
@@ -310,21 +323,7 @@ class Groups{
 	 * @return the json
 	 */
 	public static function getAllGroupsJson(){
-		// Load the corresponding dataset (in read-mode)
-		$groups = new Dataset('groups',false);
-		$list = array();
-		// iterate over group
-		foreach($groups->dom->getElementsByTagName("group") as $group){
-			// TODO Error handling
-			$item["groupid"] = $group->getAttribute("id");
-			$item["name"] = $group->getAttribute("name");
-			$item["description"] = $group->getAttribute("description");
-			$item["seats"] = $group->getAttribute("seats");
-			$item["students"] = Student::getStudentsInGroupCount($item["groupid"]);
-
-			$list[] = $item;
-		}
-		return json_encode($list);
+		return json_encode(Groups::getAllGroups());
 	}
 
 
@@ -341,7 +340,9 @@ class Groups{
 		$list = array();
 		// iterate over group
 		foreach($groups->dom->getElementsByTagName("group") as $group){
-			// TODO Error handling
+			// read the attributes.
+			// getAttribtue returns an empty string if the attribute is not available
+			// we do not check for those errors here.
 			$item["groupid"] = $group->getAttribute("id");
 			$item["name"] = $group->getAttribute("name");
 			$item["description"] = $group->getAttribute("description");
