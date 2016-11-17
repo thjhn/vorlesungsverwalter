@@ -60,19 +60,31 @@ class Dataset{
 
 				// The required lock depends on the value of writeable.
 				if($this->writeable){
-					$lock = LOCK_EX;
+					// check whether the file is actualy writable
+					if(is_writable($this->xml_file)){
+						// try to get the lock
+						if(flock($this->lock_file, LOCK_EX)){
+							// OK; We got the Shared-lock
+							// Let's load the DOM
+							$this->dom = new DOMDocument();
+							$this->dom->load($this->xml_file);
+							$this->loaded = True;
+						}else{
+							Logger::log("dataset.php tried to get the lock for ".$this->xml_file." which failed.",Logger::LOGLEVEL_WARNING);
+						}
+					}else{
+						Logger::log("dataset.php tried to open ".$this->xml_file." in write mode but the file is not writable.",Logger::LOGLEVEL_WARNING);
+					}
 				}else{
-					$lock = LOCK_SH;
-				}
-
-				if(flock($this->lock_file, $lock)){
-					// OK; We got the Shared-lock
-					// Let's load the DOM
-					$this->dom = new DOMDocument();
-					$this->dom->load($this->xml_file);
-					$this->loaded = True;
-				}else{
-					Logger::log("dataset.php tried to get the lock for ".$this->xml_file." which failed.",Logger::LOGLEVEL_WARNING);
+					if(flock($this->lock_file, LOCK_SH)){
+						// OK; We got the Shared-lock
+						// Let's load the DOM
+						$this->dom = new DOMDocument();
+						$this->dom->load($this->xml_file);
+						$this->loaded = True;
+					}else{
+						Logger::log("dataset.php tried to get the lock for ".$this->xml_file." which failed.",Logger::LOGLEVEL_WARNING);
+					}
 				}
 			}else{
 				// no, the requested lock does not exist
