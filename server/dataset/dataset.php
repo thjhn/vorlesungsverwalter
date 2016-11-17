@@ -73,7 +73,7 @@ class Dataset{
 							Logger::log("dataset.php tried to get the lock for ".$this->xml_file." which failed.",Logger::LOGLEVEL_WARNING);
 						}
 					}else{
-						Logger::log("dataset.php tried to open ".$this->xml_file." in write mode but the file is not writable.",Logger::LOGLEVEL_WARNING);
+						Logger::log("dataset.php tried to open ".$this->xml_file." in write mode but the file is not writable.",Logger::LOGLEVEL_ERROR);
 					}
 				}else{
 					if(flock($this->lock_file, LOCK_SH)){
