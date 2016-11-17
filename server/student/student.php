@@ -33,7 +33,7 @@ class Student{
 	var $uid, $editable, $studentnode, $dataset;
 
 	/**
-     * The constructor loads the student using the unique id.
+         * The constructor loads the student using the unique id.
 	 *
 	 * When using this class it is important to bare in mind that there may not be a student with the given id.
 	 * 
@@ -65,6 +65,7 @@ class Student{
 		}else{
 			// dataset was not loaded!
 			Logger::log("student.php could not load dataset.",Logger::LOGLEVEL_ERROR);
+			$this->editable = false;
 			$this->uid = "";
 		}
 	}
