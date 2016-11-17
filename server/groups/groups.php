@@ -189,15 +189,21 @@ class Groups{
 	 * @param $description the description of the group
 	 * @param $seats no of seats
 	 *
-	 * @return the id of the newly generated group
+	 * @return the id of the newly generated group or -1 on failure
 	 */	
 	public static function addGroup($groupname, $description, $seats){
 		//load the sheets dataset in write-mode
 		$groups = new Dataset('groups',true);
+		// was the dataset loaded?
+		if(!$groups->isLoaded()){
+			$inputFailures[] = "INTERN";
+			Logger::log("groups.php addGroup(): Group Dataset not loaded.",Logger::LOGLEVEL_ERROR);
+			return -1;
+		}
 
 		// create a new score-node and append that node to the dataset
 		$newid = uniqid(true);
-		$nodeGroup = $groups->dom->createElement('group');		
+		$nodeGroup = $groups->dom->createElement('group');
 		$nodeGroup->setAttribute("id",$newid);
 		$nodeGroup->setAttribute("name",$groupname);
 		$nodeGroup->setAttribute("description",$description);

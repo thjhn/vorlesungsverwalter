@@ -436,7 +436,12 @@ switch($cmd){
 		}
 
 		if($data['groupid'] == "_new"){
-			Groups::addGroup($data['name'], $data['description'], $data['seats']);
+			$newID = Groups::addGroup($data['name'], $data['description'], $data['seats']);
+			if($newID<0){
+				print("{\"success\":\"no\",\"errormsg\":\"Interner Fehler.\"}");
+				break;
+			}
+
 			print("{\"success\":\"yes\"}");
 			break;
 		}
