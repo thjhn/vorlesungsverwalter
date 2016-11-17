@@ -47,10 +47,11 @@ $("#exams_edit_dialog").dialog({
 					data:dataobject
 				}
 			}).done(function(data){
-				$("#exams_edit_dialog").empty();
 				if(data.success == 'yes'){
+					$("#exams_changes_dialog").empty();
 					$("#exams_changes_dialog").append("<div>Die &Auml;nderungen wurden erfolgreich gespeichert.</div>");
 				}else{
+					$("#exams_changes_dialog").empty();
 					$("#exams_changes_dialog").append("<div>Die &Auml;nderungen konnten leider nicht gespeichert werden. "+data.errormsg+"</div>");
 				}
 				$("#exams_edit_dialog").dialog("close");
