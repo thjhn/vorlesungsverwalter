@@ -46,19 +46,25 @@ class Student{
 
 		// load the students-dataset
 		$this->dataset = new Dataset("students",$this->editable);
-	
-		// find the student by uid.
-		$matches = 0;
-		foreach($this->dataset->dom->getElementsByTagName("student") as $cur_stud){
-			if($cur_stud->getAttribute('id') == $uid){
-				// $cur_stud is the student we were looking for
-				$matches++;
-				$this->studentnode  = $cur_stud;
-				break;
+		// check whether loading the dataset was successful
+		if($this->dataset->isLoaded()){
+			// find the student by uid.
+			$matches = 0;
+			foreach($this->dataset->dom->getElementsByTagName("student") as $cur_stud){
+				if($cur_stud->getAttribute('id') == $uid){
+					// $cur_stud is the student we were looking for
+					$matches++;
+					$this->studentnode  = $cur_stud;
+					break;
+				}
 			}
-		}
-		// if we haven't found that student
-		if($matches == 0){
+			// if we haven't found that student
+			if($matches == 0){
+				$this->uid = "";
+			}
+		}else{
+			// dataset was not loaded!
+			Logger::log("student.php could not load dataset.",Logger::LOGLEVEL_ERROR);
 			$this->uid = "";
 		}
 	}
@@ -331,6 +337,12 @@ class Student{
 
 		// Load the corresponding dataset (in write-mode)
 		$students = new Dataset('students',true);
+		// was the dataset loaded?
+		if(!$students->isLoaded()){
+			$inputFailures[] = "INTERN";
+			Logger::log("student.php addStudent(): Student Dataset not loaded.'.",Logger::LOGLEVEL_ERROR);
+			return $inputFailures;
+		}
 
 		// Check whether the same names are already used
 		$matches = 0;

@@ -112,6 +112,8 @@ $("#register_btn_submit").on('click',function(e){
 			loadGroups();
 			if(data.failures[0]=='DUPLICATE'){
 				showErrorMsg("Ihre Anmeldung zur Vorlesung war <b>nicht</b> erfolgreich. Es wurde bereits ein Eintrag mit Ihrem Namen gefunden. Kontaktieren Sie bitte das Vorlesungsteam.");
+			}else if(data.failures[0]=='INTERN'){
+				showErrorMsg("Ihre Anmeldung zur Vorlesung war <b>nicht</b> erfolgreich. Ein interner Fehler ist aufgetreten. Kontaktieren Sie bitte das Vorlesungsteam.");
 			}else{
 				showErrorMsg("Ihre Anmeldung zur Vorlesung war <b>nicht</b> erfolgreich. Füllen Sie die markierten Felder korrekt aus.");
 			}
