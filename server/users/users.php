@@ -407,6 +407,13 @@ class Users{
 
 		// load the users-dataset
 		$users = new Dataset("users",true);
+		// was the dataset loaded?
+		if(!$users->isLoaded()){
+			$inputFailures[] = "INTERN";
+			Logger::log("user.php addNewUser(): User Dataset not loaded.'.",Logger::LOGLEVEL_ERROR);
+			return $inputFailures;
+		}
+
 		$nodeUser = $users->dom->createElement('user');
 		$nodeUser->setAttribute('username',$username);
 		$nodeUser->setAttribute('realname',$realname);
