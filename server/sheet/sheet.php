@@ -46,25 +46,31 @@ class Sheet{
 
 		// load the sheet-dataset
 		$this->dataset = new Dataset("sheets",$this->editable);
-
-		// find the sheet by sid.
-		$matches = 0;
-		foreach($this->dataset->dom->getElementsByTagName("score") as $cur_score){
-			if($cur_score->getAttribute('sid') == $sid){
-				// $cur_score is the student we were looking for
-				$matches++;
-				$this->sheetnode  = $cur_score;
-				break;
+		if($this->dataset->isLoaded()){
+			// find the sheet by sid.
+			$matches = 0;
+			foreach($this->dataset->dom->getElementsByTagName("score") as $cur_score){
+				if($cur_score->getAttribute('sid') == $sid){
+					// $cur_score is the student we were looking for
+					$matches++;
+					$this->sheetnode  = $cur_score;
+					break;
+				}
 			}
-		}
-		// if we haven't found that student
-		if($matches == 0){
+			// if we haven't found that student
+			if($matches == 0){
+				$this->sid = "";
+			}
+		}else{
+			// dataset was not loaded!
+			Logger::log("sheet.php could not load dataset.",Logger::LOGLEVEL_ERROR);
+			$this->editable = false;
 			$this->sid = "";
 		}
 	}
 
 	/**
-     * Update the Score of this sheet.
+	 * Update the Score of this sheet.
 	 * 
 	 * @param string $newScore The sheets's new Score
 	 * @return true or false, depending on the success of the operation.
@@ -97,7 +103,7 @@ class Sheet{
 	}
 
 	/**
-     * Get the Corrector of the sheet.
+	 * Get the Corrector of the sheet.
 	 * 
 	 * @return The corrector or false.
 	*/
@@ -112,7 +118,7 @@ class Sheet{
 	}
 
 	/**
-     * Returns the score that the student with id $uid recieved on sheet $sheet.
+	 * Returns the score that the student with id $uid recieved on sheet $sheet.
 	 *
 	 * It returns a Json-object with a field 'success' indicating whether the request was sucessfully ('yes') or not ('no').
 	 * In case of success there a the fields 'score' contaning the recieved score, 'corrector' containing the corrector's username and 'correctorreal' containing the corrector's real name.
@@ -357,7 +363,7 @@ class Sheet{
 
 
 	/**
-     * Returns the scores that the student with id $uid recieved.
+	 * Returns the scores that the student with id $uid recieved.
 	 *
 	 * It returns a Json-object with a field 'success' indicating whether the request was sucessfully ('yes') or not ('no').
 	 * The field 'list' contains the a list of items that in turn contain the fields 'score', 'sheet', 'corrector', 'correctorreal'.
@@ -408,10 +414,9 @@ class Sheet{
 	 * 
 	 * @param Auth $auth The user's authentication object
 	 * @param string $sheet The no. of the sheet.
-	 * @param string $student The student's uid.
+	 * @param string[] $students An array of the students' ids
 	 * $param string $score The recieved score
 	 * $param string $corrector The id of the corrector entering that score
-	 * @todo ERRORhandling; check whether the student really exists; Change type of $student into string[] to allow multiple students per sheet
 	 * 
 	 * @return A Json-object with a field 'success'.
 	*/
@@ -435,6 +440,12 @@ class Sheet{
 		// Now, we are sure that the students exists.
 		//load the sheets dataset in write-mode
 		$sheets = new Dataset('sheets',true);
+		// was the dataset loaded?
+		if(!$sheets->isLoaded()){
+			Logger::log("sheet.php setScore(): Dataset not loaded.",Logger::LOGLEVEL_ERROR);
+			return "{\"success\":\"no\",\"errormsg\":\"Es ist ein interner Fehler aufgetreten.\"}";
+		}
+
 		//we only allow one entry per sheet and per student
 		$matches = 0;
 		foreach($sheets->dom->getElementsByTagName("score") as $scorenode){
