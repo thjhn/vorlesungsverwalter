@@ -25,19 +25,13 @@ $("#exams_edit_dialog").dialog({
 	width:500,
 	buttons: {
 		"Speichern": function(){
-			// add each field that has to be changed to the changearray
-			var editarray = [];
-			$("#exams_edit_dialog input[class=field_edited]").each(function(index){
-				editarray.push({field:$(this).attr("name"), newvalue:$(this).attr("value")});
-			});
-			$("#exams_edit_dialog select[name=registration] option:selected").each(function(index){
-				editarray.push({field:$(this).parent().attr("name"), newvalue:$(this).attr("value")});
-			});
-			$("#exams_edit_dialog select[name=enterscores] option:selected").each(function(index){
-				editarray.push({field:$(this).parent().attr("name"), newvalue:$(this).attr("value")});
-			});
+			var dataobject = {
+				exam:$("#exams_edit_dialog input[name=examid]").attr("value"),
+				name:$("#exams_edit_dialog input[name=name]").attr("value"),
+				registration:$("#exams_edit_dialog select[name=registration] option:selected").attr("value"),
+				enterscores:$("#exams_edit_dialog select[name=enterscores] option:selected").attr("value")
+			};
 
-			var dataobject = {exam:$("#exams_edit_dialog input[name=examid]").attr("value"), changes:editarray};
 			$.ajax({
 				url:"i.php",
 				type:"POST",
@@ -57,13 +51,11 @@ $("#exams_edit_dialog").dialog({
 				$("#exams_edit_dialog").dialog("close");
 				$("#exams_changes_dialog").dialog("open");
 
-				$("#exams_edit_dialog input").removeClass("field_edited");
 				$("#exams_edit_dialog input[name=password]").attr("value","");
 				refreshExamsTable();
 			});
 		},
 		"Abbrechen": function(){
-			$("#exams_edit_dialog input").removeClass("field_edited");
 			$( this ).dialog( "close" );
 		}
 	}
@@ -96,10 +88,6 @@ $("#exams_addexam").on('click',function(e){
 	$("#exams_edit_dialog").dialog("open");
 	$("#exams_edit_dialog input[name=examid]").attr("value","_new");
 	$("#exams_edit_dialog input[name=name]").attr("value","");
-
-	// we mark each field with changes by adding the class 'field_edited'
-	$("#exams_edit_dialog input").addClass("field_edited");
-	$("#exams_edit_dialog input[type=hidden]").removeClass("field_edited");
 });
 
 
@@ -114,18 +102,18 @@ function refreshExamsTable(){
 		$("#exams_examlist tbody").empty();
 		for(i=0; i<data.length; i++){
 			// Generate the enabled-picture
-			if(data[i].registration=='enabled'){
+			if(data[i].registration=='true'){
 				var exams_field_enabled = "<img src=\"client/icons/bullet_green.png\" alt=\"yes\" title=\"Zur Klausur ist derzeit eine Anmeldung möglich.\">";
 			}else{
 				var exams_field_enabled = "<img src=\"client/icons/bullet_red.png\" alt=\"no\" title=\"Zur Klausur ist derzeit keine Anmeldung möglich.\">";
 			}
-			if(data[i].enterscores=='enabled'){
+			if(data[i].enterscores=='true'){
 				var exams_field_enterscores = "<img src=\"client/icons/bullet_green.png\" alt=\"yes\" title=\"Die Klausur kann derzeit bepunktet werden.\">";
 			}else{
 				var exams_field_enterscores = "<img src=\"client/icons/bullet_red.png\" alt=\"no\" title=\"Die Klausur kann derzeit nicht bepunktet werden.\">";
 			}
 
-			$("#exams_examlist tbody").append("<tr><td class='exams_examidtd'>"+data[i].exam+"</td><td class='exams_examnametd'>"+data[i].name+"</td><td>"+exams_field_enabled+"</td><td>"+exams_field_enterscores+"</td></tr>");
+			$("#exams_examlist tbody").append("<tr><td class='exams_examidtd'>"+data[i].exam+"</td><td class='exams_examnametd'>"+data[i].examname+"</td><td>"+exams_field_enabled+"</td><td>"+exams_field_enterscores+"</td></tr>");
 		}
 
 		// Activate tooltips for the newly added pictures
@@ -158,11 +146,6 @@ function refreshExamsTable(){
 
 			$("#exams_edit_dialog").find("input[name=username]").first().attr("value", cur_examid );
 
-			// add an event handler
-			// we mark each field with changes by adding the class 'field_edited'
-			$("#exams_edit_dialog input").on('change',function(e){
-				$(this).addClass("field_edited");
-			});
 
 			// open the dialog
 			$("#exams_edit_dialog").dialog("open");

@@ -45,7 +45,7 @@ class Exams{
 		// find the exam by id.
 		$matches = 0;
 		foreach($this->dataset->dom->getElementsByTagName("exam") as $cur_exam){
-			if($cur_exam->getElementsByTagName("id")->item(0)->nodeValue == $this->exam){
+			if($cur_exam->getAttribute("id") == $this->exam){
 				// $cur_exam is the exam we were looking for
 				$matches++;
 				$this->examnode  = $cur_exam;
@@ -64,27 +64,134 @@ class Exams{
 		}
 	}
 
+
 	/**
-	 * Try to get the value of a field.
-	 * 
-	 * @param string $tagname The name of the field.
+	 * Check whether exam is loaded.
 	 *
-	 * @return mixed returns false if the required field is not present. It returns the value of the first node with that tagename else.
+	 * @return bool loaded status
 	 */
-	function getField($tagname){
-		if($this->exam != ""){ // check whether loading an exam was successfully before
-			$nodes = $this->examnode->getElementsByTagName($tagname);
-			if($nodes->length > 0){
-				if($nodes->length > 1) Logger::log("There are more than one field ".$tagname." for exam".$this->exam,Logger::LOGLEVEL_WARNING);
-				return $nodes->item(0)->nodeValue;
-			}else{
-				return FALSE;
-			}
-		}else{ // exam was not loaded properly before
-			Logger::log("Tried to read field ".$tagname." from an exam that was not loaded properly.",Logger::LOGLEVEL_WARNING);
-			return FALSE;
+	function isLoaded(){
+		return $this->exam != "";
+	}
+
+
+	/**
+	 * Save changes permanently.
+	 * 
+	 * @return bool true on success.
+	 */
+	function save(){
+		if(!$this->isLoaded()) return false;
+
+		$this->dataset->save();
+		return true;
+	}
+
+
+	/**
+         * Provides the exam name
+	 *
+	 * @return name, or empty string on failure
+	 */
+	function getName(){
+		if(!$this->isLoaded()) return "";
+		return $this->examnode->getAttribute("name");
+	}
+
+
+	/**
+         * Set the exam name
+	 * The changes are not stored permanently. Call save() to
+	 * actually store changes.
+	 * @param $name the new value
+	 *
+	 * @return boolean true on success, false on failure
+	 */
+	function setName($name){
+		if(!$this->isLoaded()) return False;
+
+		$this->examnode->setAttribute("name",$name);
+		return True;
+	}
+
+	/**
+         * Is registration enabled?
+	 *
+	 * @param $stringoutput true if output is a true/false string
+	 *
+	 * @return boolean state or 'yes' and 'no' (see parameters)
+	 */
+	function getEnabled($stringoutput = False){
+		if(!$this->isLoaded()) return False;
+
+		$state = $this->examnode->getAttribute("registration");
+		if($stringoutput){
+			return $state;
+		}
+		if($state == 'true'){
+			return true;
+		}else{
+			return false;
 		}
 	}
+
+	/**
+         * Enable or Disable registration to exam
+	 * The changes are not stored permanently. Call save() to
+	 * actually store changes.
+	 * @param $state 'yes' or 'no'
+	 *
+	 * @return boolean true on success, false on failure
+	 */
+	function setEnabled($state){
+		if(!$this->isLoaded()) return False;
+		if($state == "true"){
+			$this->examnode->setAttribute("registration","true");
+		}else{
+			$this->examnode->setAttribute("registration","false");
+		}
+		return True;
+	}
+
+
+	/**
+         * Is storing scores enabled?
+	 * @param $stringoutput true if output is a true/false string
+	 * @return mixed state boolean or string (see params)
+	 */
+	function getEnterscores($stringoutput=false){
+		if(!$this->isLoaded()) return False;
+
+		$state = $this->examnode->getAttribute("enterscores");
+		if($stringoutput){
+			return $state;
+		}
+		if($state == 'true'){
+			return true;
+		}else{
+			return false;
+		}
+	}
+
+	/**
+         * Enable or Disable storing scores
+	 * The changes are not stored permanently. Call save() to
+	 * actually store changes.
+	 * @param $state 'yes' or 'no'
+	 *
+	 * @return boolean true on success, false on failure
+	 */
+	function setEnterscores($state){
+		if(!$this->isLoaded()) return False;
+		if($state == "true"){
+			$this->examnode->setAttribute("enterscores","true");
+		}else{
+			$this->examnode->setAttribute("enterscores","false");
+		}
+		return True;
+	}
+
+
 
 	/**
          * Get most of the data about the Exam as a Json-object.
@@ -98,9 +205,9 @@ class Exams{
 			$retstr  = "{";
 			$retstr .= "\"success\":\"yes\",";
 			$retstr .= "\"exam\":\"".$this->exam."\",";
-			$retstr .= "\"name\":\"".$this->getField("name")."\",";
-			$retstr .= "\"registration\":\"".$this->getField("registration")."\",";
-			$retstr .= "\"enterscores\":\"".$this->getField("enterscores")."\"";
+			$retstr .= "\"name\":\"".$this->getName()."\",";
+			$retstr .= "\"registration\":\"".$this->getEnabled(true)."\",";
+			$retstr .= "\"enterscores\":\"".$this->getEnterscores(true)."\"";
 			$retstr .= "}";
 			return $retstr;
 		}else{
@@ -117,7 +224,7 @@ class Exams{
 	 *
 	 * @return boolean Was saving changes successful?
 	 */
-	function saveChanges($changes){
+	/*function saveChanges($changes){
 		if($this->editable){
 			if($this->exam != ""){
 				for($i=0;$i<count($changes);$i++){
@@ -144,7 +251,7 @@ class Exams{
 			Logger::log("Tried to save changes in read-only mode!",Logger::LOGLEVEL_ERROR);
 				return false;
 		}
-	}
+	}*/
 
 
 	/**
@@ -154,16 +261,16 @@ class Exams{
 	 */
 	public static function getAllExamsJson(){
 		// Load the corresponding dataset (in read-mode)
-		$users = new Dataset('exams',false);
+		$exams = new Dataset('exams',false);
 
 		$list = array();
 		// iterate over exams
-		foreach($users->dom->getElementsByTagName("exam") as $exam){
+		foreach($exams->dom->getElementsByTagName("exam") as $exam){
 			// TODO Error handling
-			$item["exam"] = $exam->getElementsByTagName("id")->item(0)->nodeValue;
-			$item["name"] = $exam->getElementsByTagName("name")->item(0)->nodeValue;
-			$item["registration"] = $exam->getElementsByTagName("registration")->item(0)->nodeValue;
-			$item["enterscores"] = $exam->getElementsByTagName("enterscores")->item(0)->nodeValue;
+			$item["exam"] = $exam->getAttribute("id");
+			$item["examname"] = $exam->getAttribute("name");
+			$item["registration"] = $exam->getAttribute("registration");
+			$item["enterscores"] = $exam->getAttribute("enterscores");
 
 			$list[] = $item;
 		}
@@ -182,9 +289,7 @@ class Exams{
 		// create a new score-node and append that node to the dataset
 		$newid = uniqid(true);
 		$nodeExam = $exams->dom->createElement('exam');
-		$nodeExamID = $exams->dom->createElement('id');
-		$nodeExamID->nodeValue=$newid;
-		$nodeExam->appendChild($nodeExamID);
+		$nodeExam->setAttribute("id",$newid);
 		$exams->dom->childNodes->item(0)->appendChild($nodeExam);
 		$exams->save();
 		return $newid;

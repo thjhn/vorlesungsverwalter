@@ -264,14 +264,13 @@ switch($cmd){
 				$exam = new Exams($data['exam'],true);
 			}
 			// now, (try to) save changes
-			if( !$exam->saveChanges($data["changes"]) ){
-				// at least one score change failed
-				$success = false;
-				$errormsg .= "Die Änderung der Klausureigenschaften konnten nicht gespeichert werden.";
-			}
+			$exam->setName($data["name"]);
+			$exam->setEnabled($data["registration"]);
+			$exam->setEnterscores($data["enterscores"]);
+			
 
 			// now its time to return sth.
-			if( $success ){
+			if( $exam->save() ){
 				print("{\"success\":\"yes\"}");
 			}else{
 				print("{\"success\":\"no\",\"errormsg\":\"".$errormsg."\"}");

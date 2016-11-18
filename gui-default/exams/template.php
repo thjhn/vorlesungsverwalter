@@ -22,7 +22,7 @@ include_once("server/logger/logger.php");
 function generate_exams_template(){
 
 	// if the users picks an exam, a dialog appears:
-	$tmpl .= "<div id=\"exams_edit_dialog\" title=\"Klausur bearbeiten\"><div><form id=\"exams_edit_dialogform\"><input type='hidden' name='examid'><table><tr><td>Klausurname</td><td><input type='input' name='name'></td></tr><!--tr><td>Beschreibung</td><td><input type='input' name='description'></td></tr--><tr><td>Anmeldung</td><td><select name='registration'><option value=\"enabled\">erlaubt</option><option value=\"disabled\">gesperrt</option></select></td></tr><tr><td>Bewerten</td><td><select name='enterscores'><option value=\"enabled\">erlaubt</option><option value=\"disabled\">gesperrt</option></select></td></tr></table></form></div></div>";
+	$tmpl .= "<div id=\"exams_edit_dialog\" title=\"Klausur bearbeiten\"><div><form id=\"exams_edit_dialogform\"><input type='hidden' name='examid'><table><tr><td>Klausurname</td><td><input type='input' name='name'></td></tr><tr><td>Anmeldung</td><td><select name='registration'><option value=\"true\">erlaubt</option><option value=\"false\">gesperrt</option></select></td></tr><tr><td>Bewerten</td><td><select name='enterscores'><option value=\"true\">erlaubt</option><option value=\"false\">gesperrt</option></select></td></tr></table></form></div></div>";
 	$tmpl .= "<div id=\"exams_error_dialog\" title=\"Fehler\"></div>";
 	$tmpl .= "<div id=\"exams_changes_dialog\" title=\"Speicherung der &Auml;nderung\"></div>";
 
