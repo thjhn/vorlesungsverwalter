@@ -195,6 +195,52 @@ $("#students_btn_find").on('click',function(e){
 				});
 			});
 
+			// load sheet scores
+			$.ajax({
+				url:"i.php",
+				type:"post",
+				dataType:"json",
+				data:{
+					cmd:"GET_ALL_EXAMS"
+				}
+			}).done(function(data){
+				$("#students_exams").empty();
+				for(var i=0;i<data.length;i++){
+					$("#students_exams").append("<p><button class='students_examregister' title='Zur Klausur anmelden'><div class='hidden' class='students_examregister_id'>"+data[i].exam+"</div>Zur Klausur "+data[i].examname+" anmelden.</button></p>");
+				}
+
+				// make the button nicer using jquery-ui
+				$( ".students_examregister" ).button({
+					icons: {
+						primary: "ui-icon-plusthick"
+					},
+					text: true
+				});
+				// add an event handler
+				$( ".students_examregister" ).on('click',function(e){
+					var myID = $(this).children(".students_examregister_id").text();
+					var dataobject = {exam:$(this).find(".students_examregister_id").text(), student:$("#mod_students_edit_dialog input[name=uid]").attr("value")};
+					$.ajax({
+						url:"i.php",
+						type:"post",
+						dataType:"json",
+						data:{
+							cmd:"REGISTER_STUDENT_TO_EXAM",
+							data:dataobject
+						}
+					}).done(function(data){
+						if(data.success == 'yes'){
+							$("#students_changes_dialog").append("<div>Die Anmeldung war erfolgreich.</div>");
+							$("#mod_students_edit_dialog").dialog("close");
+							$("#students_changes_dialog").dialog("open");
+						}else{
+							showErrorMsg("Die Anmeldung ist fehlgeschlagen. "+data.errormsg);
+						}
+					});
+				});
+
+			});
+
 			// add an event handler
 			// we mark each field with changes by adding the class 'field_edited'
 			$("#mod_students_edit_dialog input").on('change',function(e){
