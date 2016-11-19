@@ -218,6 +218,48 @@ class Exams{
 	}
 
 	/**
+         * Register a student to this exam.
+	 *
+	 * @param string $student the id of the student to be added
+	 *
+	 * @return json with fields success ('yes' or 'no') and an error
+	 * 	message errormsg is success=='no'
+	 */
+	function registerStudent($student){
+		// First try to verify that the student exists
+		$stud = new Student($student);
+		if(!$stud->loaded()){
+			Logger::log("Tried adding student $student to exam but student does not exist.",Logger::LOGLEVEL_WARNING);
+			return "{\"success\":\"no\",\"errormsg\":\"Student ist nicht zur Vorlesung angemeldet.\"}";
+		}
+
+		// Verify that the student is not yet registered to  the exam.
+		$matches = 0;
+		foreach($this->examnode->getElementsByTagName("student") as $cur_stud){
+			if($cur_stud->getAttribute("id") == $student){
+				// $cur_stud this already to be registered.
+				$matches++;
+				break;
+			}
+		}
+		if($matches > 0){
+			Logger::log("Tried adding student $student to exam but student is already registrered.",Logger::LOGLEVEL_VERBOSE);
+			return "{\"success\":\"no\",\"errormsg\":\"Student ist bereits zur Klausur angemeldet.\"}";
+		}
+
+		$newNode = $this->dataset->dom->createElement("student");
+		$newNode->setAttribute("id",$student);
+		$this->examnode->appendChild($newNode);
+		if($this->dataset->save()){
+			return "{\"success\":\"yes\"}";
+		}else{
+			Logger::log("Tried adding student $student to exam but saving failed.",Logger::LOGLEVEL_VERBOSE);
+			return "{\"success\":\"no\",\"errormsg\":\"Interner Fehler.\"}";
+		}
+	}
+
+
+	/**
 	 * Change certain values of that exams
 	 * 
 	 * @param array $changes A list of changes to be made. Each item is an associative array with fields 'field' and 'newvalue'

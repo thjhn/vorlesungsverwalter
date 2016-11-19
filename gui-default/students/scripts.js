@@ -206,7 +206,7 @@ $("#students_btn_find").on('click',function(e){
 			}).done(function(data){
 				$("#students_exams").empty();
 				for(var i=0;i<data.length;i++){
-					$("#students_exams").append("<p><button class='students_examregister' title='Zur Klausur anmelden'><div class='hidden' class='students_examregister_id'>"+data[i].exam+"</div>Zur Klausur "+data[i].examname+" anmelden.</button></p>");
+					$("#students_exams").append("<p><button class='students_examregister' title='Zur Klausur anmelden'><div class='hidden students_examregister_id'>"+data[i].exam+"</div>Zur Klausur "+data[i].examname+" anmelden.</button></p>");
 				}
 
 				// make the button nicer using jquery-ui

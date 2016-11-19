@@ -125,7 +125,12 @@ class Dataset{
 	function save(){
 		// check whether we opened the dataset writable.
 		if($this->writeable){
-			$this->dom->save($this->xml_file);
+			if($this->dom->save($this->xml_file) === false){
+				Logger::log("dataset.php tried to save changes in file ".$this->xml_file." which failed.",Logger::LOGLEVEL_ERROR);
+				return false;
+			}else{
+				return true;
+			}
 		}else{
 			Logger::log("dataset.php tried to save changes in file ".$this->xml_file." which was opend read-only.",Logger::LOGLEVEL_WARNING);
 			return false;

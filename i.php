@@ -284,6 +284,45 @@ switch($cmd){
 
 
 	///////////////////////////////////////////////////////////////
+	// Register a student to a certain exam.
+	// Admins can register users at any time. Anybody else is only
+	// allowed to call this command at certain times.
+	// Currently, only admins can call this command!
+	// 
+	// Roles required: admin
+	case 'REGISTER_STUDENT_TO_EXAM':
+		Logger::log("Interface got 'REGISTER_STUDENT_TO_EXAM'.",Logger::LOGLEVEL_VERBOSE);
+		if(!$AUTH->hasRole("admin")){
+			Logger::log("Interface got 'REGISTER_STUDENT_TO_EXAM' from a not admin. But currently registration is not allowed.",Logger::LOGLEVEL_ERROR);
+			print("{\"success\":\"no\",\"errormsg\":\"Interner Fehler.\"}");
+			break;
+		}
+
+		// Check validity of input
+		if(preg_match('/^[0-9a-zA-Z]+$/', $data['exam'])==0){
+			Logger::log("Interface got 'REGISTER_STUDENT_TO_EXAM' got an invalid exam id ".$data['exam'].".",Logger::LOGLEVEL_ERROR);
+			print("{\"success\":\"no\",\"errormsg\":\"Interner Fehler.\"}");
+			break;
+		}
+		if(preg_match('/^[0-9a-zA-Z]+$/', $data['student'])==0){				
+			Logger::log("Interface got 'REGISTER_STUDENT_TO_EXAM' got an invalid student id ".$data['exam'].".",Logger::LOGLEVEL_ERROR);
+			print("{\"success\":\"no\",\"errormsg\":\"Interner Fehler.\"}");
+			break;
+		}
+
+		$exam = new Exams($data['exam'],true);
+		if(!$exam->isLoaded()){
+			Logger::log("Interface got 'REGISTER_STUDENT_TO_EXAM' but could not load exam with id ".$data['exam'].".",Logger::LOGLEVEL_ERROR);
+			print("{\"success\":\"no\",\"errormsg\":\"Interner Fehler.\"}");
+			break;
+		}
+
+		print($exam->registerStudent($data['student']));
+		break;
+
+
+
+	///////////////////////////////////////////////////////////////
 	// Add a new student to the database.
 	// The following fields are required: familyname, givenname,
 	// matrnr, term, email, course, ingroup
