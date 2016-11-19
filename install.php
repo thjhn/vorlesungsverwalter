@@ -63,6 +63,9 @@
     $out .= "			<module key=\"scoreresults\"/>\n";
     $out .= "			<module key=\"scorestats\"/>\n";
     $out .= "		</box>\n";
+    $out .= "           <box title=\"Klausuren\">\n";
+    $out .= "                   <module key=\"enterscoresexam\"/>\n";
+    $out .= "           </box>\n";
     $out .= "		<box title=\"Konfiguration\">\n";
     $out .= "			<module key=\"settings\"/>\n";
     $out .= "			<module key=\"groups\"/>\n";

@@ -135,6 +135,7 @@ class Exams{
 		}
 	}
 
+
 	/**
          * Enable or Disable registration to exam
 	 * The changes are not stored permanently. Call save() to
@@ -163,7 +164,7 @@ class Exams{
 	function getNoProblems(){
 		if(!$this->isLoaded()) return -1;
 
-		$return = $this->examnode->getAttribute("problems");
+		return $this->examnode->getAttribute("problems");
 	}
 
 
@@ -202,6 +203,53 @@ class Exams{
 			$this->examnode->setAttribute("enterscores","false");
 		}
 		return True;
+	}
+
+
+	/**
+         * Store scores for a given student.
+	 *
+	 * We assume that count($scores) equals the number of problems
+	 * 
+	 * @param $auth auth object for encryption
+	 * @param $student student id
+	 * @param string[] $scores Array of scores
+	 * @param bool $overwrite allow overwriting existing values!
+	 *
+	 * @return JSON
+	 */
+	function setScore($auth, $student, $scores, $overwrite=false){
+		if(!$this->isLoaded()){
+			Logger::log("Tried to add scores but dataset was not loaded.",Logger::LOGLEVEL_WARNING);
+			return "{\"success\":\"no\", \"errormsg\":\"Interner Fehler\"}";
+		}
+		if(!$this->editable){
+			Logger::log("Tried to add scores but dataset was not loaded in write mode.",Logger::LOGLEVEL_ERROR);
+			return "{\"success\":\"no\", \"errormsg\":\"Interner Fehler\"}";
+		}
+		// Find the students node.
+		$matches = 0;
+		foreach($this->examnode->getElementsByTagName("student") as $cur_stud){
+			if($cur_stud->getAttribute("id") == $student){
+				// $cur_stud this already to be registered.
+				$matches++;
+				break;
+			}
+		}
+		if($matches == 0){
+			Logger::log("Tried to add exam scores but student was not found.",Logger::LOGLEVEL_VERBOSE);
+			return "{\"success\":\"no\", \"errormsg\":\"Student ist nicht zur Klausur angemeldet.\"}";
+		}
+		// create the score nodes
+		if( (!$overwrite) && ($cur_stud->getAttribute("scores") != "") ){
+			// We already have stored sth and we do not allow overwrite
+			Logger::log("Tried to add exam scores but score was already set.",Logger::LOGLEVEL_VERBOSE);
+			return "{\"success\":\"no\", \"errormsg\":\"Es sind bereits Punkte eingetragen.\"}";
+		}
+		$cur_stud->setAttribute("scores",Crypto::encrypt_in_team(json_encode($scores),$auth));
+		$this->dataset->save();
+		return "{\"success\":\"yes\"}";
+		
 	}
 
 

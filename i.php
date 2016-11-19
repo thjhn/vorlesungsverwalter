@@ -443,6 +443,44 @@ switch($cmd){
 		break;
 
 
+
+	///////////////////////////////////////////////////////////////
+	// Add a new score entry to an exam
+	// The following fields are required: exam, student, scores
+	// 
+	// Roles required: admin
+	case 'ENTER_SCORE_EXAM':
+		// user wants to enter some scores
+		Logger::log("Interface got 'ENTER_SCORE_EXAM'.",Logger::LOGLEVEL_VERBOSE);
+		if($AUTH->hasRole("admin")){
+			$theData = json_decode($data,true);
+			$exam = new Exams($theData['exam'], true);
+			if(!$exam->isLoaded()){
+				Logger::log("Interface got 'ENTER_SCORE_EXAM' but could not load exam ".$theData['exam'].".",Logger::LOGLEVEL_ERROR);
+				print("{\"success\":\"no\",\"errormsg\":\"Interner Fehler. Keine Eintragungen wurden gespeichert!\"}");
+				break;
+			}
+			$failures = false;
+			for($i = 0; $i<count($theData["scores"]); $i++){
+				if( preg_match('/^[0-9]+(\.[0-9]+)?$/', $theData["scores"][$i])==0 ){
+					$failures = true;
+				}
+			}
+			if($failures){
+				Logger::log("One score entry was not well formated while handling command ENTER_SCORE_EXAM.",Logger::LOGLEVEL_VERBOSE);
+				print("{\"success\":\"no\",\"errormsg\":\"Eine Punktezahl ist nicht korrekt formatiert!\"}");
+				break;
+			}
+
+			print($exam->setScore($AUTH,$theData["student"],$theData["scores"]));
+
+		}else{
+			Logger::log("Interface got 'ENTER_SCORE_EXAM' but the user was not allowed to call this command.",Logger::LOGLEVEL_ERROR);
+			print("{\"success\":\"no\",\"errormsg\":\"Schwerwiegender interner Fehler. Keine Eintragungen wurden gespeichert!\"}");
+		}
+		break;
+
+
 	///////////////////////////////////////////////////////////////
 	// Get information about a group.
 	// $data contains the id of the group in question.
