@@ -578,9 +578,19 @@ switch($cmd){
 	case 'LIST_ALL_STUDENTS_SCORES':
 		Logger::log("Interface got 'LIST_ALL_STUDENTS_SCORES'.",Logger::LOGLEVEL_VERBOSE);
 		if($AUTH->hasRole("admin")){
-			print(json_encode(Sheet::getAllScores($AUTH)));
+			$studentlist = Student::getAllStudents($AUTH);
+			$scorelist = Sheet::getAllScores($AUTH);
+			$list = array();
+			for($i = 0; $i<count($studentlist); $i++){
+				$item = array();
+				$item['familyname'] = $studentlist[$i]['familyname'];
+				$item['givenname'] = $studentlist[$i]['givenname'];
+				$item['scores'] = $scorelist[ $studentlist[$i]['id'] ]['scores'];
+				$list[ $studentlist[$i]['id'] ] = $item;
+			}
+			print(json_encode($list));
 		}else{
-			Logger::log("Interface got 'LIST_ALL_STUDENTS_SCORES' with data $data but the user was not allowed to call this command.",Logger::LOGLEVEL_ERROR);
+			Logger::log("Interface got 'LIST_ALL_STUDENTS_SCORES' with but the user was not allowed to call this command.",Logger::LOGLEVEL_ERROR);
 			print("{\"success\":\"no\",\"errormsg\":\"Schwerwiegender interner Fehler.\"}");
 		}
 		break;
@@ -667,7 +677,7 @@ switch($cmd){
 			print("{\"success\":\"no\",\"errormsg\":\"Schwerwiegender interner Fehler.\"}");
 			break;
 		}
-		print(Student::getAllStudentsJson($AUTH));
+		print(json_encode(Student::getAllStudents($AUTH)));
 		break;
 
 

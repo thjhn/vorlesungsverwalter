@@ -471,14 +471,14 @@ class Student{
 
 
 	/**
-     * Generate a Json-list containing all data of all students.
+	 * Generate a Json-list containing all data of all students.
 	 *
 	 * @param auth the user's authentification object
-	 * @return string The Json-list.
+	 * @return string[] a big array
 	 *
 	 * @todo Error handling.
 	*/
-	public static function getAllStudentsJson($auth){
+	public static function getAllStudents($auth){
 		// Get a list of all groups for later lookup.
 		// TODO: What happpens, when this fails?
 		$groups = Groups::getAllGroups();
@@ -538,7 +538,7 @@ class Student{
 
 			$list[] = $item;
 		}
-		return json_encode($list);
+		return $list;
 	}
 
 }
