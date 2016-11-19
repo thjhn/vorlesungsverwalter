@@ -153,6 +153,19 @@ class Exams{
 		return True;
 	}
 
+	/**
+         * Get the number of problems.
+	 * Note that there is no corresponding set function as this field should never
+	 * be changed!
+	 *
+	 * @return int number of problems, -1 on failure
+	 */
+	function getNoProblems(){
+		if(!$this->isLoaded()) return -1;
+
+		$return = $this->examnode->getAttribute("problems");
+	}
+
 
 	/**
          * Is storing scores enabled?
@@ -206,6 +219,7 @@ class Exams{
 			$retstr .= "\"success\":\"yes\",";
 			$retstr .= "\"exam\":\"".$this->exam."\",";
 			$retstr .= "\"name\":\"".$this->getName()."\",";
+			$retstr .= "\"problems\":\"".$this->getNoProblems()."\",";
 			$retstr .= "\"registration\":\"".$this->getEnabled(true)."\",";
 			$retstr .= "\"enterscores\":\"".$this->getEnterscores(true)."\"";
 			$retstr .= "}";
@@ -259,42 +273,6 @@ class Exams{
 	}
 
 
-	/**
-	 * Change certain values of that exams
-	 * 
-	 * @param array $changes A list of changes to be made. Each item is an associative array with fields 'field' and 'newvalue'
-	 *
-	 * @return boolean Was saving changes successful?
-	 */
-	/*function saveChanges($changes){
-		if($this->editable){
-			if($this->exam != ""){
-				for($i=0;$i<count($changes);$i++){
-					$node = $this->examnode->getElementsByTagName($changes[$i]['field']);
-					if($node->length > 0){
-						if($node->length > 1){
-							Logger::log("There are more than one ".$changes[$i]['field']."-nodes for exam ".$this->exam,Logger::LOGLEVEL_WARNING);
-						}
-
-						$node->item(0)->nodeValue = $changes[$i]['newvalue'];
-					}else{
-						$newnode = $this->dataset->dom->createElement($changes[$i]['field'],$changes[$i]['newvalue']);
-						$this->examnode->appendChild($newnode);
-					}
-				}
-
-				$this->dataset->save();
-				return true;
-			}else{
-				Logger::log("Tried to save changes for a not existing exam!",Logger::LOGLEVEL_ERROR);
-				return false;
-			}
-		}else{
-			Logger::log("Tried to save changes in read-only mode!",Logger::LOGLEVEL_ERROR);
-				return false;
-		}
-	}*/
-
 
 	/**
 	 * Returns a json object containing some information about each exam
@@ -311,6 +289,7 @@ class Exams{
 			// TODO Error handling
 			$item["exam"] = $exam->getAttribute("id");
 			$item["examname"] = $exam->getAttribute("name");
+			$item["problems"] = $exam->getAttribute("problems");
 			$item["registration"] = $exam->getAttribute("registration");
 			$item["enterscores"] = $exam->getAttribute("enterscores");
 
@@ -321,17 +300,22 @@ class Exams{
 
 	/**
 	 * Add an exam with a newly generated id.
-	 * The values of the new exam are in no way specified. You sould call saveChanges afterwards!
+	 * The values of the new exam are in no way specified. You sould store them afterwards.
+	 * However, the field problems is set when adding an Exam. This field cannot be changed
+	 * afterwards.
 	 *
+	 * @param int $problems number of problems in the exam
+	 * 
 	 * @return the id of the newly generated exam
 	*/	
-	public static function addExam(){
+	public static function addExam($problems){
 		//load the exams dataset in write-mode
 		$exams = new Dataset('exams',true);
 		// create a new score-node and append that node to the dataset
 		$newid = uniqid(true);
 		$nodeExam = $exams->dom->createElement('exam');
 		$nodeExam->setAttribute("id",$newid);
+		$nodeExam->setAttribute("problems",$problems);
 		$exams->dom->childNodes->item(0)->appendChild($nodeExam);
 		$exams->save();
 		return $newid;

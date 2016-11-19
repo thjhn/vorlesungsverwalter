@@ -28,6 +28,7 @@ $("#exams_edit_dialog").dialog({
 			var dataobject = {
 				exam:$("#exams_edit_dialog input[name=examid]").attr("value"),
 				name:$("#exams_edit_dialog input[name=name]").attr("value"),
+				problems:$("#exams_edit_dialog input[name=problems]").attr("value"),
 				registration:$("#exams_edit_dialog select[name=registration] option:selected").attr("value"),
 				enterscores:$("#exams_edit_dialog select[name=enterscores] option:selected").attr("value")
 			};
@@ -82,12 +83,13 @@ $( "#exams_addexam" ).button({
 	text: true
 });
 
-// add an event to the 'add a group' button
+// add an event to the 'add an exam ' button
 $("#exams_addexam").on('click',function(e){
 	e.preventDefault();
 	$("#exams_edit_dialog").dialog("open");
 	$("#exams_edit_dialog input[name=examid]").attr("value","_new");
 	$("#exams_edit_dialog input[name=name]").attr("value","");
+	$("#exams_edit_dialog input[name=problems]").attr("value","");
 });
 
 
@@ -113,12 +115,14 @@ function refreshExamsTable(){
 				var exams_field_enterscores = "<img src=\"client/icons/bullet_red.png\" alt=\"no\" title=\"Die Klausur kann derzeit nicht bepunktet werden.\">";
 			}
 
-			$("#exams_examlist tbody").append("<tr><td class='exams_examidtd'>"+data[i].exam+"</td><td class='exams_examnametd'>"+data[i].examname+"</td><td>"+exams_field_enabled+"</td><td>"+exams_field_enterscores+"</td></tr>");
+			$("#exams_examlist tbody").append("<tr><td class='exams_examidtd'>"+data[i].exam+"</td><td class='exams_examnametd'>"+data[i].examname+"</td><td class='exams_problems'>"+data[i].problems+"</td><td>"+exams_field_enabled+"</td><td>"+exams_field_enterscores+"</td></tr>");
 		}
 
 		// Activate tooltips for the newly added pictures
 		$(document).tooltip();
 			
+
+		// Click event handler on each row
 		$("#exams_examlist tbody tr").on('click',function(e){
 			e.preventDefault();
 
@@ -135,6 +139,7 @@ function refreshExamsTable(){
 				if(data.success == 'yes'){
 					$("#exams_edit_dialog").find("input[name=examid]").attr("value",data.exam);
 					$("#exams_edit_dialog").find("input[name=name]").attr("value",data.name);
+					$("#exams_edit_dialog").find("input[name=problems]").attr("value",data.problems);
 					$("#exams_edit_dialog").find("select option").attr("selected","");
 					$("#exams_edit_dialog").find("select[name=registration] option[value='"+data.registration+"']").attr("selected","selected");
 					$("#exams_edit_dialog").find("select[name=enterscores] option[value='"+data.enterscores+"']").attr("selected","selected");		
@@ -143,8 +148,6 @@ function refreshExamsTable(){
 					// TODO ERRORMSG
 				}
 			});
-
-			$("#exams_edit_dialog").find("input[name=username]").first().attr("value", cur_examid );
 
 
 			// open the dialog

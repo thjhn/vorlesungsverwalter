@@ -22,13 +22,13 @@ include_once("server/logger/logger.php");
 function generate_exams_template(){
 
 	// if the users picks an exam, a dialog appears:
-	$tmpl .= "<div id=\"exams_edit_dialog\" title=\"Klausur bearbeiten\"><div><form id=\"exams_edit_dialogform\"><input type='hidden' name='examid'><table><tr><td>Klausurname</td><td><input type='input' name='name'></td></tr><tr><td>Anmeldung</td><td><select name='registration'><option value=\"true\">erlaubt</option><option value=\"false\">gesperrt</option></select></td></tr><tr><td>Bewerten</td><td><select name='enterscores'><option value=\"true\">erlaubt</option><option value=\"false\">gesperrt</option></select></td></tr></table></form></div></div>";
+	$tmpl .= "<div id=\"exams_edit_dialog\" title=\"Klausur bearbeiten\"><div><form id=\"exams_edit_dialogform\"><input type='hidden' name='examid'><table><tr><td>Klausurname</td><td><input type='input' name='name'></td></tr><tr><td>Anzahl der Aufgaben</td><td><input type='input' name='problems'></td></tr><tr><td>Anmeldung</td><td><select name='registration'><option value=\"true\">erlaubt</option><option value=\"false\">gesperrt</option></select></td></tr><tr><td>Bewerten</td><td><select name='enterscores'><option value=\"true\">erlaubt</option><option value=\"false\">gesperrt</option></select></td></tr></table></form></div></div>";
 	$tmpl .= "<div id=\"exams_error_dialog\" title=\"Fehler\"></div>";
 	$tmpl .= "<div id=\"exams_changes_dialog\" title=\"Speicherung der &Auml;nderung\"></div>";
 
 	// in the lower part of the panel there is a list of exams
 	$tmpl .= "<h1>Klausuren</h1>";
-	$tmpl .= "<table class=\"tablesorter\" id=\"exams_examlist\"><thead><tr><th class=\"header\" colspan='2'>Klausur</th><th class=\"header\">Anmeldung</th><th class=\"header\">Bewerten</th></thead><tbody></tbody></table>";
+	$tmpl .= "<table class=\"tablesorter\" id=\"exams_examlist\"><thead><tr><th class=\"header\" colspan='2'>Klausur</th><th class=\"header\">Aufgaben</th><th class=\"header\">Anmeldung</th><th class=\"header\">Bewerten</th></thead><tbody></tbody></table>";
 	$tmpl .= "<div><button id='exams_addexam'>Neue Klausur erstellen.</button></div>";
 
 	return $tmpl;

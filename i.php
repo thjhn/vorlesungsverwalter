@@ -248,6 +248,10 @@ switch($cmd){
 	// The exam and the new data are given in the data object.
 	// If the given exam-id is _new we actually create a new
 	// exam (and create our own exam-id).
+	// If a new exam is added the $data field 'problems' indicates
+	// how many problems the exam will contain. This field cannot be
+	// changed afterwards. If it is provided for an existing exam
+	// it will be ignored.
 	// 
 	// Roles required: admin
 	case 'EDIT_EXAM':
@@ -258,7 +262,7 @@ switch($cmd){
 			$errormsg = "";
 			// if the examid equals _new, we are asked to add a new group.
 			if($data['exam'] == "_new"){
-				$newid = Exams::addExam();
+				$newid = Exams::addExam($data["problems"]);
 				$exam = new Exams($newid,true);
 			}else{
 				$exam = new Exams($data['exam'],true);
