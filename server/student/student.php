@@ -471,7 +471,7 @@ class Student{
 
 
 	/**
-	 * Generate a Json-list containing all data of all students.
+	 * Generate an array containing all data of all students.
 	 *
 	 * @param auth the user's authentification object
 	 * @return string[] a big array

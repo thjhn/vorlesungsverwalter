@@ -580,12 +580,14 @@ switch($cmd){
 		if($AUTH->hasRole("admin")){
 			$studentlist = Student::getAllStudents($AUTH);
 			$scorelist = Sheet::getAllScores($AUTH);
+			$examlist = Exams::getAllScores($AUTH);
 			$list = array();
 			for($i = 0; $i<count($studentlist); $i++){
 				$item = array();
 				$item['familyname'] = $studentlist[$i]['familyname'];
 				$item['givenname'] = $studentlist[$i]['givenname'];
 				$item['scores'] = $scorelist[ $studentlist[$i]['id'] ]['scores'];
+				$item['exams'] = $examlist[ $studentlist[$i]['id'] ];
 				$list[ $studentlist[$i]['id'] ] = $item;
 			}
 			print(json_encode($list));

@@ -24,7 +24,7 @@ function generate_scoreresults_template(){
 
 	// List of entered scores (by the current user)
 	$tmpl .= "<h2>&Uuml;bersicht &uuml;ber die erreichten Punkte.</h2>";
-	$tmpl .= "<div><table  class='colored' id=\"scoreresults_list\"><thead><tr><th>Student</th></thead><tbody></tbody></table></div>";
+	$tmpl .= "<div><table  class='colored' id=\"scoreresults_list\"><thead></thead><tbody></tbody></table></div>";
 
 	return $tmpl;
 }

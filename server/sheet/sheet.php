@@ -157,7 +157,7 @@ class Sheet{
 		// create a list of zero-scores
 		$zeroScoreList = array();
 		for($i=0; $i<$nrofsheets; $i++){
-			$zeroScoreList[] = "--";
+			$zeroScoreList[] = "";
 		}
 
 		//load the sheets dataset in read-mode

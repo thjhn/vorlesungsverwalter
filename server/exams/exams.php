@@ -321,6 +321,59 @@ class Exams{
 	}
 
 
+	/**
+	 * Returns all scores of all students.
+	 *
+	 * It returns an array of <A> with indices the UIDs of the
+	 * score entries.
+	 * <A> is an array of objects with fields
+	 *   <exam> id of an exam
+	 *   <examname> name of an exam
+	 *   <problems> number of problems in this exam
+	 *   <scores> with value of type <B>
+	 * <B> is an array of the scores indexed problem no.
+	 * 
+	 * @param Auth $auth the authentication object used for decryption.
+	 * 
+	 * @return see above
+	 */
+	public static function getAllScores($auth){
+		//load the exams dataset in read-mode
+		$exams = new Dataset('exams',false);
+
+		// $list is the list we are going to return later
+		$list = array();
+
+		// iterate over all score-nodes.
+		foreach($exams->dom->getElementsByTagName("exam") as $examnode){
+			$entry = array();
+			$entry["exam"] = $examnode->getAttribute("id");
+			$entry["examname"] = $examnode->getAttribute("name");
+			$entry["examname"] = $examnode->getAttribute("name");
+			$entry["problems"] = $examnode->getAttribute("problems");
+			$problems = (int)($entry["problems"]);
+			// create a list of zero-scores
+			$zeroScoreList = array();
+			for($i=0; $i<$problems; $i++){
+				$zeroScoreList[] = "--";
+			}
+
+
+			// iterate over all included students
+			foreach($examnode->getElementsByTagName("student") as $studnode){
+				// add the scores
+				$curUid = $studnode->getAttribute("id");
+				$scoreStr = $studnode->getAttribute("scores");
+				$entry["scores"] = $zeroScoreList;
+				if($scoreStr != ""){
+					$entry["scores"] = json_decode(Crypto::decrypt_in_team($scoreStr,$auth));
+				}
+				$list[$curUid][ $examnode->getAttribute("id") ] = $entry;
+			}
+		}
+		return $list;
+	}
+
 
 	/**
 	 * Returns a json object containing some information about each exam
