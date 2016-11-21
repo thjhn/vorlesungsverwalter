@@ -218,7 +218,7 @@ class Exams{
 	 *
 	 * @return JSON
 	 */
-	function setScore($auth, $student, $scores, $overwrite=false){
+	function setScore($auth, $student, $scores, $overwrite){
 		if(!$this->isLoaded()){
 			Logger::log("Tried to add scores but dataset was not loaded.",Logger::LOGLEVEL_WARNING);
 			return "{\"success\":\"no\", \"errormsg\":\"Interner Fehler\"}";

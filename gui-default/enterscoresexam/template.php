@@ -24,6 +24,7 @@ function generate_enterscoresexam_template(){
 	$tmpl .= "<div class='inputbox sm'><span class='label'>Klausur:</span><select size=\"1\" id=\"enterscoresexam_exam\" class='ui-corner-all'></select></div>";
 	$tmpl .= "<div class='inputbox' id='enterscoresexam_thenameboxes'><span class='label'>Namen des Students</span><div class='enterscoresexam_namebox'><input type=\"text\" value=\"\" id=\"enterscoresexam_name\" class='ui-corner-all'/><input type=\"hidden\" value=\"\" id=\"enterscoresexam_select_id\"/></div></div>";
 	$tmpl .= "<div id='enterscoresexam_points'></div>";
+	$tmpl .= "<div class='inputbox'><span class='label'>&Uuml;berschreiben:</span><input type=\"checkbox\" id=\"enterscoresexam_overwrite\" caption=\"ladida\"/> Bestehende Daten &uuml;berschreiben.</div>";
 	$tmpl .= "<button id='enterscoresexam_enter'><span class='button_label'>Eintragen</span></button>";
 	$tmpl.="</form></div>";
 

@@ -63,7 +63,7 @@ $("#enterscoresexam_enter").on('click',function(e){
 		dataType:"json",
 		data:{
 			cmd:"ENTER_SCORE_EXAM",
-			data:"{\"exam\":\""+$("#enterscoresexam_exam option:selected").attr("value")+"\",\"student\":\""+$("#enterscoresexam_select_id").attr("value")+"\",\"scores\":["+scorestring.substr(0,scorestring.length-1)+"]}"
+			data:"{\"exam\":\""+$("#enterscoresexam_exam option:selected").attr("value")+"\",\"student\":\""+$("#enterscoresexam_select_id").attr("value")+"\",\"scores\":["+scorestring.substr(0,scorestring.length-1)+"], \"overwrite\":\""+$("#enterscoresexam_overwrite").prop("checked")+"\"}"
 		}
 	}).done(function(data){
 		if(data.success=="yes"){
@@ -123,6 +123,7 @@ function loadScores(){
 		  student:$('#enterscoresexam_select_id').attr("value")}}
 	}).done(function(data){
 		if(data.success == 'yes'){
+			$("#enterscoresexam_overwrite").prop("checked",false)
 			var count = 0;
 			$(".enterscoresexam_credits").each(function(){
 				$(this).attr("value",data.scores[count++]);

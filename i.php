@@ -446,7 +446,7 @@ switch($cmd){
 
 	///////////////////////////////////////////////////////////////
 	// Add a new score entry to an exam
-	// The following fields are required: exam, student, scores
+	// The following fields are required: exam, student, scores, overwrite
 	// 
 	// Roles required: admin
 	case 'ENTER_SCORE_EXAM':
@@ -467,12 +467,18 @@ switch($cmd){
 				}
 			}
 			if($failures){
-				Logger::log("One score entry was not well formated while handling command ENTER_SCORE_EXAM.",Logger::LOGLEVEL_VERBOSE);
+				Logger::log("A score entry was not well formated while handling command ENTER_SCORE_EXAM.",Logger::LOGLEVEL_VERBOSE);
 				print("{\"success\":\"no\",\"errormsg\":\"Eine Punktezahl ist nicht korrekt formatiert!\"}");
 				break;
 			}
+			
+			if($theData["overwrite"] == "true"){
+				$theData["overwrite"] = true;
+			}else{
+				$theData["overwrite"] = false;
+			}
 
-			print($exam->setScore($AUTH,$theData["student"],$theData["scores"]));
+			print($exam->setScore($AUTH,$theData["student"],$theData["scores"],$theData["overwrite"]));
 
 		}else{
 			Logger::log("Interface got 'ENTER_SCORE_EXAM' but the user was not allowed to call this command.",Logger::LOGLEVEL_ERROR);
