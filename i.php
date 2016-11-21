@@ -482,6 +482,29 @@ switch($cmd){
 
 
 	///////////////////////////////////////////////////////////////
+	// Get the scores of a student in a given exam.
+	// The following data fields are required: exam, student
+	// 
+	// Roles required: admin
+	case 'GET_SCORE_EXAM':
+		// user wants to enter some scores
+		Logger::log("Interface got 'GET_SCORE_EXAM'.",Logger::LOGLEVEL_VERBOSE);
+		if($AUTH->hasRole("admin")){
+			$exam = new Exams($data['exam'], false);
+			if(!$exam->isLoaded()){
+				Logger::log("Interface got 'GET_SCORE_EXAM' but could not load exam ".$data['exam'].".",Logger::LOGLEVEL_ERROR);
+				print("{\"success\":\"no\",\"errormsg\":\"Interner Fehler.\"}");
+				break;
+			}
+			print($exam->getStudentScores($AUTH,$data["student"]));
+		}else{
+			Logger::log("Interface got 'GET_SCORE_EXAM' but the user was not allowed to call this command.",Logger::LOGLEVEL_ERROR);
+			print("{\"success\":\"no\",\"errormsg\":\"Schwerwiegender interner Fehler.\"}");
+		}
+		break;
+
+
+	///////////////////////////////////////////////////////////////
 	// Get information about a group.
 	// $data contains the id of the group in question.
 	// 

@@ -282,6 +282,35 @@ class Exams{
 	/**
          * Register a student to this exam.
 	 *
+	 * @param Auth $auth an authentication object for encryption
+	 * @param string $student the id of the student to be added
+	 *
+	 * @return json with fields success ('yes' or 'no') and an error
+	 * 	message errormsg is success=='no'
+	 */
+	function getStudentScores($auth, $student){
+		// Find the student node
+		foreach($this->examnode->getElementsByTagName("student") as $cur_stud){
+			if($cur_stud->getAttribute("id") == $student){
+				// There it is: $cur_stud
+				$scoreStr = $cur_stud->getAttribute("scores");
+				if($scoreStr != ""){
+					$entry["scores"] = json_decode(Crypto::decrypt_in_team($scoreStr,$auth));
+					$entry["success"] = "yes";
+					return json_encode($entry);
+				}else{
+					return "{\"success\":\"no\",\"errormsg\":\"Keine Punkte eingetragen.\"}";
+				}
+				break;
+			}
+		}
+		return "{\"success\":\"no\",\"errormsg\":\"Student nicht gefunden.\"}";
+	}
+
+
+	/**
+         * Register a student to this exam.
+	 *
 	 * @param string $student the id of the student to be added
 	 *
 	 * @return json with fields success ('yes' or 'no') and an error

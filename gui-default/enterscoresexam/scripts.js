@@ -42,6 +42,7 @@ $("#enterscoresexam_name").autocomplete({
 		// populate the text-field with the acutal name and the hidden field with the student's id
 		$(this).siblings("#enterscoresexam_select_id").attr("value",item.item.id);
 		$(this).val(item.item.value);
+		loadScores();
 		return false;
 	}
 });
@@ -107,6 +108,29 @@ function adjustScoreBoxes(){
 			for(i = 1; i <= data.problems; i++){
 				$("#enterscoresexam_points").append("<div class='inputbox sm'><span class='label'>Aufgabe "+i+"</span><input type=\"text\" value=\"\" class=\"enterscoresexam_credits\" class='ui-corner-all'/></div>");
 			}
+			loadScores();
+		}
+	});
+}
+
+function loadScores(){
+	$.ajax({
+		url:"i.php",
+		type:"post",
+		dataType:"json",
+		data:{cmd:"GET_SCORE_EXAM",
+		  data:{exam:$("#enterscoresexam_exam option:selected").attr("value"),
+		  student:$('#enterscoresexam_select_id').attr("value")}}
+	}).done(function(data){
+		if(data.success == 'yes'){
+			var count = 0;
+			$(".enterscoresexam_credits").each(function(){
+				$(this).attr("value",data.scores[count++]);
+			});
+		}else{
+			$(".enterscoresexam_credits").each(function(){
+				$(this).attr("value","");
+			});			
 		}
 	});
 }
