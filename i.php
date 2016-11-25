@@ -89,6 +89,7 @@ switch($cmd){
 	//
 	// Roles required: none
 	case 'CHANGE_PASSWORD':
+		Logger::log("Interface got 'CHANGE_PASSWORD' for current user.",Logger::LOGLEVEL_VERBOSE);
 		$rt = $AUTH->change_password($data['oldpassword'],$data['newpassword']);
 		if(count($rt)>0){
 			print("{\"success\":\"no\"}");
