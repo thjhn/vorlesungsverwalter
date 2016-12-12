@@ -17,7 +17,8 @@
  *  along with VV3.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-var thead_tr_1st = "<th rowspan='2'>Name</th><th rowspan='2'>MatrNr</th>";
+
+var thead_tr_1st = "<th rowspan='2' class='scoreresults_cols_names'>Name</th><th rowspan='2' class='scoreresults_cols_matrnr'>MatrNr</th>";
 var thead_tr_2nd = "";
 // get the number of sheets and generate the corresponding tableheader
 $.ajax({
@@ -28,11 +29,11 @@ $.ajax({
 }).done(function(data){
 	if(data.success=='yes'){
 		for(var i = 1; i <= data.sheets; i++){
-			thead_tr_2nd += "<th>"+i+"</th>";
+			thead_tr_2nd += "<th class='scoreresults_cols_scores'>"+i+"</th>";
 		}
 	}
-	thead_tr_1st += "<th colspan='"+(data.sheets+1)+"'>&Uuml;bungen</th>";
-	thead_tr_2nd += "<th>Sum</th>";
+	thead_tr_1st += "<th colspan='"+(data.sheets+1)+"' class='scoreresults_cols_scores'>&Uuml;bungen</th>";
+	thead_tr_2nd += "<th class='scoreresults_cols_scores'>Sum</th>";
 
 	// get the exams and generate the corresponding tableheader
 	var examids = [];
@@ -46,11 +47,11 @@ $.ajax({
 		for(var i = 0; i < data.length; i++){
 			examids.push(data[i].exam);
 			examproblems.push(parseInt(data[i].problems));
-			thead_tr_1st += "<th colspan='"+(parseInt(data[i].problems)+1)+"'>"+data[i].examname+"</th>";
+			thead_tr_1st += "<th colspan='"+(parseInt(data[i].problems)+1)+"' class='scoreresults_cols_exams'>"+data[i].examname+"</th>";
 			for(var j = 1; j <= data[i].problems; j++){
-				thead_tr_2nd += "<th>"+j+"</th>";
+				thead_tr_2nd += "<th class='scoreresults_cols_exams'>"+j+"</th>";
 			}
-			thead_tr_2nd += "<th>Sum</th>";
+			thead_tr_2nd += "<th class='scoreresults_cols_exams'>Sum</th>";
 		}
 
 		$("#scoreresults_list thead").append("<tr>"+thead_tr_1st+"</tr>");	
@@ -68,43 +69,44 @@ $.ajax({
 				var scoreTDs = "";
 				var sum = 0.0;
 				for(var i=0; i<value.scores.length; i++){
-					scoreTDs = scoreTDs + "<td>" + value.scores[i] + "</td>";
+					scoreTDs = scoreTDs + "<td class='scoreresults_cols_scores'>" + value.scores[i] + "</td>";
 					if(value.scores[i] != ''){
 						sum += parseFloat(value.scores[i]);
 					}
 				}
-				scoreTDs = scoreTDs + "<td>" + sum + "</td>";
+				scoreTDs = scoreTDs + "<td class='scoreresults_cols_scores'>" + sum + "</td>";
 
 				for(var i=0; i<examids.length; i++){
 					var cur_examid = examids[i];
 					var emptyExam = "";
 					for( var j=0; j<= examproblems[i]; j++){
-						emptyExam += "<td></td>";
+						emptyExam += "<td class='scoreresults_cols_exams'></td>";
 					}
 					if(value.exams != null && value.exams[cur_examid] != null){
 						sum = 0.0;
 						for(j = 0; j< value.exams[cur_examid].scores.length; j++){
-							scoreTDs += "<td>"+value.exams[cur_examid].scores[j]+"</td>";
+							scoreTDs += "<td class='scoreresults_cols_exams'>"+value.exams[cur_examid].scores[j]+"</td>";
 							sum += parseFloat(value.exams[cur_examid].scores[j]);
 						}
-						scoreTDs += "<td>"+sum+"</td>";
+						scoreTDs += "<td class='scoreresults_cols_exams'>"+sum+"</td>";
 					}else scoreTDs += emptyExam;
 				}
-
-				$("#scoreresults_list tbody").append("<tr><td>"+value.familyname+", "+value.givenname+"</td><td>"+value.matrnr+"</td>"+scoreTDs+"</tr>");
+				$("#scoreresults_list tbody").append("<tr><td class='scoreresults_cols_names'>"+value.familyname+", "+value.givenname+"</td><td class='scoreresults_cols_matrnr'>"+value.matrnr+"</td>"+scoreTDs+"</tr>");
 			});
 	
 			$("#scoreresults_list").tablesorter();
 		});
 	
 	});
-
-
-
 });
 
 
+$("#scoreresults_cols input").on('click',function(e){
+	if(this.checked){
+		$("."+this.name).show();
 
-
-
-
+	}else{
+		$("."+this.name).hide();
+	}
+//	alert(this.name+"  "+this.checked);
+});

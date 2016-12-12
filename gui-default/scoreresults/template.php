@@ -24,6 +24,11 @@ function generate_scoreresults_template(){
 
 	// List of entered scores (by the current user)
 	$tmpl .= "<h2>&Uuml;bersicht &uuml;ber die erreichten Punkte.</h2>";
+	$tmpl .= "<div>Spalten anzeigen:<br/>";
+	$tmpl .= "<form id='scoreresults_cols'><p><input type='checkbox' name='scoreresults_cols_names' checked='checked'/>Namen<br/>";
+	$tmpl .= "<input type='checkbox' name='scoreresults_cols_matrnr' checked='checked'/>Matrikelnummern<br/>";
+	$tmpl .= "<input type='checkbox' name='scoreresults_cols_scores' checked='checked'/>&Uuml;bungspunkte<br/>";
+	$tmpl .= "<input type='checkbox' name='scoreresults_cols_exams' checked='checked'/>Klausuren</form></div>";
 	$tmpl .= "<div><table  class='colored' id=\"scoreresults_list\"><thead></thead><tbody></tbody></table></div>";
 
 	return $tmpl;
