@@ -137,7 +137,11 @@ class Authentication{
 	}
 
 
-	// This function returns the current loginstate
+	/**
+	 * Provides a JSON response containing some information about the current user.
+	 *
+	 * @return JSON
+	 */
 	function loginstate(){
 		if($this->logged_in){
 			return "{\"success\":\"yes\",\"status\":\"in\",\"username\":\"".$this->username."\",\"realname\":\"".$this->realname."\",\"roles\":\"".$this->roles."\"}";
@@ -145,39 +149,29 @@ class Authentication{
 			return "{\"success\":\"yes\",\"status\":\"out\"}";
 		}
 	}
-/***---***/
-	// Change the user's password (provided that she is logged in)
+
+	/**
+	 * Change the password of the current user.
+	 *
+	 * @param $oldpasswd string the user's old password
+	 * @param $newpasswd string the user's new password
+	 *
+	 * @return string[] an array of error messages. If the array is empty, everything is fine.
+	 */
 	function change_password($oldpasswd,$newpasswd){
 		if($this->logged_in){
-			// for password changes we need write access.
-			$users = new Dataset("users",true);
-			// we look for the user:
-			foreach($users->dom->getElementsByTagName("user") as $cur_user){
-				$namenodes = $cur_user->getElementsByTagName("username");
-				if($namenodes->length == 1){
-					if($namenodes->item(0)->nodeValue == $this->username){
-
-						$passwordnodes = $cur_user->getElementsByTagName("privkeykey");
-						if($passwordnodes->length == 1){
-								// we encrypt the private key key with the password provided by the user.
-								// if this is successfull the user will be logged in.
-								$decrypted_privkeykey = Crypto::decrypt_privkeykey($passwordnodes->item(0)->nodeValue,$oldpasswd);
-								if($decrypted_privkeykey === false){
-									return ["PASSWORT_REJECTED"];
-								}
-
-								$newprivkeykey = Crypto::encrypt_privkeykey($newpasswd,$this);
-								if($newprivkeykey === false){
-									return ["INTERNAL"];
-								}
-
-								$passwordnodes->item(0)->nodeValue = $newprivkeykey;
-								$users->save();
-								return [];
-						}
-					}
-				}
+			// load the user in write mode
+			$user = new Users($this->username,true);
+			$key = $user->getDecryptedPrivKeyKey($oldpasswd); // try to get key
+			if($key === false){ // something went wrong
+				return ["INTERNAL"];
 			}
+			// Note, loading the $key in this way is not necessary for changing the password
+			// but we want to make sure that the $oldpasswd was correct.
+			if($user->setPassword($newpasswd,$AUTH) && $user->save()){ // save new key
+				return [];
+			}
+			return ["INTERN"];
 		}
 		return ["INTERNAL"];
 	}
