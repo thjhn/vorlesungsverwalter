@@ -115,6 +115,25 @@ class Student{
 		}
 	}
 
+	/**
+	 * Try to return the students matrnr.
+	 *
+	 * @return the Matrikelnummer or -1 on failure.
+	 */
+	function getMatrnr(){
+		if( !($this->loaded()) ){
+			Logger::log("student.php Tried to get matrnr of a student that was not loaded.",Logger::LOGLEVEL_ERROR);
+			return -1;
+		}
+		$matrnr_dec = Crypto::decrypt_team($this->getField("matrnr"),$auth);
+		if($matrnr_dec === False){
+			Logger::log("student.php Could not decrypt Matrnr of a student.",Logger::LOGLEVEL_ERROR);
+			return -1;
+		}
+
+		return $matrnr_dec;
+	}
+
 
 
 	/**
