@@ -616,6 +616,7 @@ switch($cmd){
 				$item = array();
 				$item['familyname'] = $studentlist[$i]['familyname'];
 				$item['givenname'] = $studentlist[$i]['givenname'];
+				$item['matrnr'] = $studentlist[$i]['matrnr'];
 				$item['scores'] = $scorelist[ $studentlist[$i]['id'] ]['scores'];
 				$item['exams'] = $examlist[ $studentlist[$i]['id'] ];
 				$list[ $studentlist[$i]['id'] ] = $item;

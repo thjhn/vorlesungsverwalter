@@ -17,7 +17,7 @@
  *  along with VV3.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-var thead_tr_1st = "<th rowspan='2'>Name</th>";
+var thead_tr_1st = "<th rowspan='2'>Name</th><th rowspan='2'>MatrNr</th>";
 var thead_tr_2nd = "";
 // get the number of sheets and generate the corresponding tableheader
 $.ajax({
@@ -91,7 +91,7 @@ $.ajax({
 					}else scoreTDs += emptyExam;
 				}
 
-				$("#scoreresults_list tbody").append("<tr><td>"+value.familyname+", "+value.givenname+"</td>"+scoreTDs+"</tr>");
+				$("#scoreresults_list tbody").append("<tr><td>"+value.familyname+", "+value.givenname+"</td><td>"+value.matrnr+"</td>"+scoreTDs+"</tr>");
 			});
 	
 			$("#scoreresults_list").tablesorter();
