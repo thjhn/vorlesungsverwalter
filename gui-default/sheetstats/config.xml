@@ -18,7 +18,7 @@
  *  along with VV3.  If not, see <http://www.gnu.org/licenses/>.
 -->
 <config>
-	<title>Statistiken Blaetter</title>
+	<title>Statistiken Blätter</title>
 	<roles>
 		<role>admin</role>
 	</roles>

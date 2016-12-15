@@ -43,12 +43,10 @@ function sheetstats_generateSheetStat(){
 					if(sheetstats_graphheight<curstat['max']) sheetstats_graphheight = parseFloat(curstat['max'])+2.0;
 				}
 			}
-			console.log(sheetstats_graphheight);
+
 			if(histlist.length > 0){
 				$.jqplot('sheetstats_chartdiv', [histlist], {
 					seriesDefaults:{
-						//renderer:$.jqplot.BarRenderer,
-						//rendererOptions: {shadowOffset: 0},
 						renderer:$.jqplot.OHLCRenderer,
 						rendererOptions: {candleStick:true}
 					},
@@ -63,9 +61,7 @@ function sheetstats_generateSheetStat(){
 	});
 }
 
-$("#sheetstats_sheet").on('change',function(e){
-	sheetstats_generateSheetStat();
-});
+
 $("#sheetstats_group").on('change',function(e){
 	sheetstats_generateSheetStat();
 });
