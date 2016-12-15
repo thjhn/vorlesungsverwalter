@@ -168,21 +168,25 @@ class Sheet{
 
 		// iterate over all score-nodes.
 		foreach($sheets->dom->getElementsByTagName("score") as $scorenode){
-			// iterate over all included students
-			foreach($scorenode->getElementsByTagName("student") as $studnode){	
-				// add the scores
-				$curUid = $studnode->getAttribute("uid");
-				if(!array_key_exists($curUid,$list)){
-					$list[$curUid]['scores'] = $zeroScoreList;
+			// Add this score only if the auth object indicates an admin or
+			// this sheet was entered by the current user.
+			if($auth->hasRole("admin") || $scorenode->getAttribute("corrector") == $auth->getUsername()){
+				// iterate over all included students
+				foreach($scorenode->getElementsByTagName("student") as $studnode){	
+					// add the scores
+					$curUid = $studnode->getAttribute("uid");
+					if(!array_key_exists($curUid,$list)){
+						$list[$curUid]['scores'] = $zeroScoreList;
 
-					// load the data of the corresponding student:
-					$curStud = new Student($curUid);
-					$list[$curUid]['familyname'] = $curStud->getField("familyname");
-					$list[$curUid]['givenname'] = $curStud->getField("givenname");
+						// load the data of the corresponding student:
+						$curStud = new Student($curUid);
+						$list[$curUid]['familyname'] = $curStud->getField("familyname");
+						$list[$curUid]['givenname'] = $curStud->getField("givenname");
+					}
+					$score_dec = Crypto::decrypt_in_team($scorenode->getAttribute("score"),$auth);
+					if($score_dec === false){ return false; }
+					$list[$curUid]['scores'][($scorenode->getAttribute("sheet"))-1] = $score_dec;
 				}
-				$score_dec = Crypto::decrypt_in_team($scorenode->getAttribute("score"),$auth);
-				if($score_dec === false){ return false; }
-				$list[$curUid]['scores'][($scorenode->getAttribute("sheet"))-1] = $score_dec;
 			}
 		}
 		return $list;

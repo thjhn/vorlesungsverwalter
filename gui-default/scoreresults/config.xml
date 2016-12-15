@@ -20,6 +20,6 @@
 <config>
 	<title>Ergebnisse</title>
 	<roles>
-		<role>admin</role>
+		<role>corrector</role>
 	</roles>
 </config>

@@ -104,13 +104,32 @@ $.ajax({
 				$("#scoreresults_list tbody").append("<tr><td class='scoreresults_cols_names'>"+value.familyname+", "+value.givenname+"</td><td class='scoreresults_cols_matrnr'>"+value.matrnr+"</td>"+scoreTDs+"</tr>");
 			});
 	
+			// Make the table sortable
 			$("#scoreresults_list").tablesorter();
+			// Hide matrnr and exams if the user is 'only' a corrector
+			// (in which case we won't get any data to show in these rows anyways)
+			$.ajax({
+				url:"i.php",
+				type:"post",
+				dataType:"json",
+				data:{"cmd":"GET_LOGIN"}
+			}).done(function(data){
+				if(data.roles.indexOf("admin")<0){
+					$("#scoreresults_cols input[name='scoreresults_cols_matrnr']").prop("checked",false);
+					$("#scoreresults_cols input[name='scoreresults_cols_matrnr']").prop("disabled", true);
+					$(".scoreresults_cols_matrnr").hide();
+					$("#scoreresults_cols input[name='scoreresults_cols_exams']").prop("checked",false);
+					$("#scoreresults_cols input[name='scoreresults_cols_exams']").prop("disabled",true);
+					$(".scoreresults_cols_exams").hide();
+				}
+			});
 		});
 	
 	});
 });
 
 
+// there are checkboxes that allow hiding some rows
 $("#scoreresults_cols input").on('click',function(e){
 	if(this.checked){
 		$("."+this.name).show();
@@ -118,5 +137,6 @@ $("#scoreresults_cols input").on('click',function(e){
 	}else{
 		$("."+this.name).hide();
 	}
-//	alert(this.name+"  "+this.checked);
 });
+
+

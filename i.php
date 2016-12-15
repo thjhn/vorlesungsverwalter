@@ -607,18 +607,18 @@ switch($cmd){
 	// Roles required: admin
 	case 'LIST_ALL_STUDENTS_SCORES':
 		Logger::log("Interface got 'LIST_ALL_STUDENTS_SCORES'.",Logger::LOGLEVEL_VERBOSE);
-		if($AUTH->hasRole("admin")){
+		if($AUTH->hasRole("corrector")){
 			$studentlist = Student::getAllStudents($AUTH);
 			$scorelist = Sheet::getAllScores($AUTH);
-			$examlist = Exams::getAllScores($AUTH);
+			if($AUTH->hasRole("admin")) $examlist = Exams::getAllScores($AUTH);
 			$list = array();
 			for($i = 0; $i<count($studentlist); $i++){
 				$item = array();
 				$item['familyname'] = $studentlist[$i]['familyname'];
 				$item['givenname'] = $studentlist[$i]['givenname'];
-				$item['matrnr'] = $studentlist[$i]['matrnr'];
+				if($AUTH->hasRole("admin")) $item['matrnr'] = $studentlist[$i]['matrnr'];
 				$item['scores'] = $scorelist[ $studentlist[$i]['id'] ]['scores'];
-				$item['exams'] = $examlist[ $studentlist[$i]['id'] ];
+				if($AUTH->hasRole("admin"))  $item['exams'] = $examlist[ $studentlist[$i]['id'] ];
 				$list[ $studentlist[$i]['id'] ] = $item;
 			}
 			print(json_encode($list));
