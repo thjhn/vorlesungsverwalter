@@ -21,6 +21,7 @@
 var thead_tr_1st = "<th rowspan='2' class='scoreresults_cols_names'>Name</th><th rowspan='2' class='scoreresults_cols_matrnr'>MatrNr</th>";
 var thead_tr_2nd = "";
 // get the number of sheets and generate the corresponding tableheader
+var nr_of_sheets;
 $.ajax({
 	url:"i.php",
 	type:"post",
@@ -28,6 +29,7 @@ $.ajax({
 	data:{cmd:"GET_NR_OF_SHEETS",data:""}
 }).done(function(data){
 	if(data.success=='yes'){
+		nr_of_sheets = data.sheets;
 		for(var i = 1; i <= data.sheets; i++){
 			thead_tr_2nd += "<th class='scoreresults_cols_scores'>"+i+"</th>";
 		}
@@ -68,13 +70,21 @@ $.ajax({
 			$.each(data,function(index,value){
 				var scoreTDs = "";
 				var sum = 0.0;
-				for(var i=0; i<value.scores.length; i++){
-					scoreTDs = scoreTDs + "<td class='scoreresults_cols_scores'>" + value.scores[i] + "</td>";
-					if(value.scores[i] != ''){
-						sum += parseFloat(value.scores[i]);
+				if(value.scores != null){
+					for(var i=0; i<value.scores.length; i++){
+						scoreTDs = scoreTDs + "<td class='scoreresults_cols_scores'>" + value.scores[i] + "</td>";
+						if(value.scores[i] != ''){
+							sum += parseFloat(value.scores[i]);
+						}
 					}
+					scoreTDs = scoreTDs + "<td class='scoreresults_cols_scores'>" + sum + "</td>";
+				}else{
+					for(var i = 0; i<=nr_of_sheets; i++){
+						// add empty cell (including for sum row)
+						scoreTDs = scoreTDs + "<td></td>";
+					}
+
 				}
-				scoreTDs = scoreTDs + "<td class='scoreresults_cols_scores'>" + sum + "</td>";
 
 				for(var i=0; i<examids.length; i++){
 					var cur_examid = examids[i];
