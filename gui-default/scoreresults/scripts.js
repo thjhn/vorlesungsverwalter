@@ -68,13 +68,15 @@ $.ajax({
 			}
 		}).done(function(data){
 			$.each(data,function(index,value){
+				var showRow = false; // only add this row if any score is present
 				var scoreTDs = "";
 				var sum = 0.0;
 				if(value.scores != null){
 					for(var i=0; i<value.scores.length; i++){
 						scoreTDs = scoreTDs + "<td class='scoreresults_cols_scores'>" + value.scores[i] + "</td>";
 						if(value.scores[i] != ''){
-							sum += parseFloat(value.scores[i]);
+							sum += parseFloat(value.scores[i]); // add score to sum
+							showRow = true; // there is a score. show the row!
 						}
 					}
 					scoreTDs = scoreTDs + "<td class='scoreresults_cols_scores'>" + sum + "</td>";
@@ -96,12 +98,15 @@ $.ajax({
 						sum = 0.0;
 						for(j = 0; j< value.exams[cur_examid].scores.length; j++){
 							scoreTDs += "<td class='scoreresults_cols_exams'>"+value.exams[cur_examid].scores[j]+"</td>";
-							sum += parseFloat(value.exams[cur_examid].scores[j]);
+							if(value.exams[cur_examid].scores[j] != ''){
+								sum += parseFloat(value.exams[cur_examid].scores[j]);
+								showRow = true; // there is a score. show the row!
+							}
 						}
 						scoreTDs += "<td class='scoreresults_cols_exams'>"+sum+"</td>";
 					}else scoreTDs += emptyExam;
 				}
-				$("#scoreresults_list tbody").append("<tr><td class='scoreresults_cols_names'>"+value.familyname+", "+value.givenname+"</td><td class='scoreresults_cols_matrnr'>"+value.matrnr+"</td>"+scoreTDs+"</tr>");
+				if(showRow) $("#scoreresults_list tbody").append("<tr><td class='scoreresults_cols_names'>"+value.familyname+", "+value.givenname+"</td><td class='scoreresults_cols_matrnr'>"+value.matrnr+"</td>"+scoreTDs+"</tr>");
 			});
 	
 			// Make the table sortable
