@@ -227,6 +227,7 @@ class Sheet{
 		$emptyItem['max'] = 0;
 		$emptyItem['min'] = -1;
 		$emptyItem['sum'] = 0;
+		$emptyItem['sqsum'] = 0;
 		$emptyItem['count'] = 0;
 		$zeroScoreList = array();
 		for($i=0; $i<=$nrofsheets; $i++){
@@ -267,7 +268,9 @@ class Sheet{
 			foreach($scorenode->getElementsByTagName("student") as $studnode){	
 				// add the scores, first to the allgroups field.
 				$list[$curSheet]['allgroups']['sum'] += $curScore;
+				$list[$curSheet]['allgroups']['sqsum'] += $curScore*$curScore;
 				$list[0]['allgroups']['sum'] += $curScore;
+				$list[0]['allgroups']['sqsum'] += $curScore*$curScore;
 				$list[$curSheet]['allgroups']['count']++;
 				$list[0]['allgroups']['count']++;
 				if(array_key_exists($curScore,$list[$curSheet]['allgroups']['hist'])){
@@ -293,9 +296,10 @@ class Sheet{
 							$list[$curSheet][$curGroup]['max'] = $curScore;
 						}
 						if($list[$curSheet][$curGroup]['min'] < 0 || $list[$curSheet][$curGroup]['min'] > $curScore){
-							$list[$curSheet]['allgroups']['min'] = $curScore;
+							$list[$curSheet][$curGroup]['min'] = $curScore;
 						}
 						$list[$curSheet][$curGroup]['sum'] += $curScore;
+						$list[$curSheet][$curGroup]['sqsum'] += $curScore*$curScore;
 						$list[$curSheet][$curGroup]['count']++;
 						if(array_key_exists($curScore,$list[$curSheet][$curGroup]['hist'])){
 							$list[$curSheet][$curGroup]['hist'][$curScore]++;

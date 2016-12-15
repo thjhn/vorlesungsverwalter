@@ -602,6 +602,46 @@ switch($cmd){
 
 
 	///////////////////////////////////////////////////////////////
+	// Get statistics on sheets.
+	// 
+	// data must be a JSON of the following format:         *
+	//   {"sheet":<sheet>}                                  *
+	// where                                                **
+	//   <sheet> is the sheet we want the statistics for.   *
+	//	if == 0 we return the global statistic.         *
+	//
+	// Roles required: admin
+	case 'GET_SHEETSTATS':
+		Logger::log("Interface got 'GET_SHEETSTATS'.",Logger::LOGLEVEL_VERBOSE);
+		if(!$AUTH->hasRole("admin")){
+			Logger::log("Interface got 'GET_SHEETSTATS' but the user was not allowed to call this command.",Logger::LOGLEVEL_ERROR);
+			print("{\"success\":\"no\",\"errormsg\":\"Schwerwiegender interner Fehler.\"}");
+			break;
+		}
+		$scoreStat = Sheet::getAllScoresStat($AUTH);
+		if($scoreStat === False){
+			Logger::log("Interface got 'GET_SCORESTATS' but getAllScoreStat() returned false.",Logger::LOGLEVEL_ERROR);
+			print("{\"success\":\"no\",\"errormsg\":\"Schwerwiegender interner Fehler.\"}");
+			break;
+		}
+
+		$stat = [];
+		for($i = 0; $i < count($scoreStat); $i++){
+			foreach(array_keys($scoreStat[$i]) as $groupkey){
+				$stat[$i][$groupkey]['sum'] = $scoreStat[$i][$groupkey]['sum'];
+				$stat[$i][$groupkey]['sqsum'] = $scoreStat[$i][$groupkey]['sqsum'];
+				$stat[$i][$groupkey]['count'] = $scoreStat[$i][$groupkey]['count'];
+				$stat[$i][$groupkey]['max'] = $scoreStat[$i][$groupkey]['max'];
+				$stat[$i][$groupkey]['min'] = $scoreStat[$i][$groupkey]['min'];
+			}			
+		}
+
+		print("{\"success\":\"yes\",\"stat\":".json_encode($stat)."}");
+		
+		break;
+
+
+	///////////////////////////////////////////////////////////////
 	// Get a JSON of the scores of all students.
 	//
 	// Roles required: admin
