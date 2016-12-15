@@ -19,6 +19,7 @@
 
 
 function sheetstats_generateSheetStat(){
+	var sheetstats_graphheight = 0; // maximum height necessary
 	
 	// clean display before drawing anew
 	$(sheetstats_chartdiv).empty();
@@ -39,9 +40,10 @@ function sheetstats_generateSheetStat(){
 					var expect = curstat['sum']/curstat['count'];
 					var varianz = curstat['sqsum']/curstat['count'] - curstat['sum']/curstat['count']*curstat['sum']/curstat['count'];
 					histlist.push([sheet,curstat['max'],expect+Math.sqrt(varianz),curstat['min'],expect-Math.sqrt(varianz)]);
+					if(sheetstats_graphheight<curstat['max']) sheetstats_graphheight = parseFloat(curstat['max'])+2.0;
 				}
 			}
-			console.log(histlist);
+			console.log(sheetstats_graphheight);
 			if(histlist.length > 0){
 				$.jqplot('sheetstats_chartdiv', [histlist], {
 					seriesDefaults:{
@@ -54,7 +56,7 @@ function sheetstats_generateSheetStat(){
 					animate: !$.jqplot.use_excanvas,
 					axes: {
 						xaxis: {min: 0, max : data.stat.length, tickInterval:1.0, showTicks: true, show:true},
-						yaxis: {min: 0, tickInterval:1.0}
+						yaxis: {min: 0, max : sheetstats_graphheight, tickInterval:1.0}
 					}
 				});
 			}		
