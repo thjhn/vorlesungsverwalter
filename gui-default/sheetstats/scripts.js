@@ -50,8 +50,7 @@ function sheetstats_generateSheetStat(){
 						//renderer:$.jqplot.BarRenderer,
 						//rendererOptions: {shadowOffset: 0},
 						renderer:$.jqplot.OHLCRenderer,
-						rendererOptions: {candleStick:true},
-						pointLabels: {show: true, formatString: '%d'}
+						rendererOptions: {candleStick:true}
 					},
 					animate: !$.jqplot.use_excanvas,
 					axes: {
