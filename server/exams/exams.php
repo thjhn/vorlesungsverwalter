@@ -384,7 +384,7 @@ class Exams{
 			// create a list of zero-scores
 			$zeroScoreList = array();
 			for($i=0; $i<$problems; $i++){
-				$zeroScoreList[] = "--";
+				$zeroScoreList[] = "";
 			}
 
 
